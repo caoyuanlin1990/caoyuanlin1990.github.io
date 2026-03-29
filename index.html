@@ -2,141 +2,925 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的导航页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>闲时导航 - 专业稳定导航系统</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Roboto, sans-serif;
-  }
-  body {
-    background: #f5f7fa;
-    color: #333;
-    padding: 2rem 1rem;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  .title {
-    font-size: 2rem;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #222;
-  }
-  .search-box {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2.5rem;
-  }
-  .search-box input {
-    flex: 1;
-    padding: 0.9rem 1.2rem;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    outline: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .search-box button {
-    padding: 0.9rem 1.4rem;
-    border: none;
-    border-radius: 12px;
-    background: #409eff;
-    color: white;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .search-box button:hover {
-    background: #338eef;
-  }
-  .nav-group {
-    margin-bottom: 2rem;
-  }
-  .nav-group h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: #555;
-    font-weight: 500;
-  }
-  .link-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
-  }
-  .link-item {
-    background: white;
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: 0.2s;
-  }
-  .link-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    color: #409eff;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: #F7F8FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+:root {
+  --primary: #165DFF;
+  --success: #00B42A;
+  --danger: #F53F3F;
+  --warning: #FF7D00;
+  --neutral: #86909C;
+  --light: #F2F3F5;
+  --card-bg: #FFFFFF;
+  --border: #E5E6EB;
+  --radius: 16px;
+  --card-radius: 12px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --text-main: #1D2129;
+  --text-normal: #4E5969;
+}
+
+.nav-card {
+  background: var(--card-bg);
+  padding: 16px 14px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.nav-card:hover {
+  border-color: var(--primary);
+  background: #F7F8FF;
+}
+.nav-card.round { border-radius: 16px; }
+.nav-card.square { border-radius: 0; }
+.nav-card.flat { border-radius: 8px; border: none; background: #f2f3f7; }
+.nav-card.center .nav-icon { margin: 0 auto; }
+.nav-icon {
+  width: 34px;
+  height: 34px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.nav-text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+#splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  color: var(--primary);
+  gap: 16px;
+  animation: splashFade 0.4s ease forwards;
+}
+.splash-icon { font-size: 52px; }
+.splash-title { font-size: 26px; font-weight: 600; color: var(--text-main); }
+.splash-desc { font-size: 14px; color: var(--neutral); }
+.splash-footer { position: absolute; bottom: 36px; font-size: 12px; color: var(--neutral); }
+@keyframes splashFade { from { opacity: 0; } to { opacity: 1; } }
+
+#notice {
+  position: fixed; top:0; left:0; width:100%; height:100vh;
+  background: #F7F8FA; display:none; flex-direction:column; align-items:center; justify-content:center;
+  z-index:9999; padding:30px;
+}
+.notice-box {
+  background: var(--card-bg); border-radius: var(--radius); padding:30px 24px;
+  width:100%; max-width:380px; box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.notice-title { font-size:18px; font-weight:600; text-align:center; margin-bottom:18px; color:var(--text-main); }
+.notice-content { font-size:15px; line-height:1.7; color:var(--text-normal); white-space:pre-line; margin-bottom:24px; min-height:100px; }
+.notice-btn { width:100%; padding:13px; border-radius:10px; background:var(--primary); color:#fff; font-size:15px; font-weight:500; border:none; cursor:pointer; transition:background 0.2s; }
+.notice-btn:hover { background:#0E42D2; }
+.notice-footer { text-align:center; margin-top:18px; font-size:12px; color:var(--neutral); }
+
+#editModal {
+  position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.25);
+  display:none; align-items:center; justify-content:center; z-index:9999; padding:20px;
+}
+.modal-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:24px;
+  width:100%; max-width:360px; box-shadow:0 8px 25px rgba(0,0,0,0.1); border:1px solid var(--border);
+}
+.modal-title { font-size:17px; font-weight:600; margin-bottom:16px; text-align:center; color:var(--text-main); }
+.modal-input, .modal-select { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; font-size:15px; color:var(--text-main); background:#fff; }
+.modal-btns { display:flex; gap:10px; margin-top:10px; }
+.modal-btns button { flex:1; padding:11px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
+.btn-cancel { background:var(--light); color:var(--text-normal); }
+.btn-save { background:var(--primary); color:#fff; }
+
+#maintain {
+  position:fixed; inset:0; z-index:999; background:#F7F8FA;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.maintain-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:40px 30px;
+  width:100%; max-width:400px; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow); position:relative;
+}
+.maintain-icon { font-size:48px; margin-bottom:20px; color:var(--neutral); }
+.maintain-title { font-size:20px; font-weight:600; margin-bottom:10px; color:var(--text-main); }
+.maintain-desc { font-size:15px; color:var(--text-normal); line-height:1.5; margin-bottom:20px; }
+.maintain-footer { font-size:12px; color:var(--neutral); margin-top:24px; }
+#adminLoginBtnInMaintain {
+  width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
+  background:var(--card-bg); font-size:18px; cursor:pointer; transition:all 0.2s; color:var(--primary); margin-top:12px;
+}
+#adminLoginBtnInMaintain:hover { background:var(--primary); color:#fff; }
+
+#login {
+  width:100%; max-width:360px; background:var(--card-bg); border-radius:var(--radius);
+  padding:40px 30px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.login-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
+.admin-icon-btn { position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:18px; color:var(--primary); cursor:pointer; }
+.login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:28px; color:var(--text-main); }
+.login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; background:#fff; }
+.remember-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; font-size:14px; color:var(--text-normal); }
+.btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:#0E42D2; }
+
+#home {
+  width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
+  padding:30px 20px 70px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.head { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.head-title { font-size:20px; font-weight:600; color:var(--text-main); }
+.back-btn { font-size:18px; color:var(--primary); cursor:pointer; font-weight:500; }
+.category-title { font-size:16px; font-weight:600; color:var(--text-main); margin:16px 0 8px; padding-left:4px; display:flex; align-items:center; gap:6px; }
+.home-footer { position:absolute; bottom:20px; left:0; right:0; text-align:center; font-size:12px; color:var(--neutral); }
+
+#admin {
+  width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
+  padding:30px 20px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.admin-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
+.collapse-header {
+  display:flex; justify-content:space-between; align-items:center; padding:12px 0;
+  font-size:15px; font-weight:500; cursor:pointer; user-select:none; color:var(--text-main);
+}
+.collapse-arrow { font-size:13px; color:var(--neutral); transition:transform 0.2s; }
+.collapse-body { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+.collapse-body.show { max-height:1000px; }
+.section { margin-bottom:16px; }
+.form-input, .form-text, .form-select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:10px; background:#fff; }
+.form-text { min-height:70px; resize:vertical; }
+.btn-group { display:flex; gap:8px; margin-top:6px; }
+.btn-group .btn { flex:1; }
+.btn-success { background:var(--success); color:#fff; }
+.btn-danger { background:var(--danger); color:#fff; }
+.form-switch { display:flex; align-items:center; margin-bottom:10px; font-size:15px; color:var(--text-normal); }
+.form-switch input { transform:scale(1.1); margin-right:8px; }
+
+.manager-line {
+  display:flex; align-items:center; padding:13px; background:var(--light); border-radius:10px; margin-bottom:8px;
+}
+.manager-line .name { flex:1; font-size:15px; color:var(--text-main); }
+.manager-line .sort-btns { display:flex; gap:4px; margin-right:6px; }
+.manager-line .sort-btns button {
+  width:28px; height:28px; border-radius:6px; border:none; background:var(--primary); color:#fff; font-size:14px; cursor:pointer;
+}
+.manager-line button { border:none; padding:6px 10px; border-radius:8px; font-size:13px; margin-left:6px; cursor:pointer; color:#fff; }
+.btn-edit { background:var(--warning); }
+.btn-del { background:var(--danger); }
+.btn-toggle { background:var(--primary); }
+
+.log-item {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-normal);
+}
+.log-time { color: var(--primary); }
+.log-ip { color: var(--success); }
+.log-fail { color: var(--danger); }
+.log-success { color: var(--success); }
 </style>
 </head>
+
 <body>
 
-<div class="title">我的导航页</div>
-
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="百度搜索...">
-  <button onclick="doSearch()">搜索</button>
+<div id="splash">
+  <div class="splash-icon">🧭</div>
+  <div class="splash-title">闲时导航</div>
+  <div class="splash-desc">专业稳定 · 安全快捷 · 持续可用</div>
+  <div class="splash-footer" id="splash_copyright"></div>
 </div>
 
-<div class="nav-group">
-  <h2>常用</h2>
-  <div class="link-grid">
-    <a class="link-item" href="https://www.baidu.com" target="_blank">百度</a>
-    <a class="link-item" href="https://www.bilibili.com" target="_blank">B站</a>
-    <a class="link-item" href="https://www.zhihu.com" target="_blank">知乎</a>
-    <a class="link-item" href="https://www.douban.com" target="_blank">豆瓣</a>
-    <a class="link-item" href="https://www.163.com" target="_blank">网易</a>
-    <a class="link-item" href="https://weibo.com" target="_blank">微博</a>
+<div id="notice">
+  <div class="notice-box">
+    <div class="notice-title">📢 系统公告</div>
+    <div class="notice-content" id="notice_content"></div>
+    <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
+    <div class="notice-footer" id="notice_copyright"></div>
   </div>
 </div>
 
-<div class="nav-group">
-  <h2>工具</h2>
-  <div class="link-grid">
-    <a class="link-item" href="https://www.aliyundrive.com" target="_blank">阿里云盘</a>
-    <a class="link-item" href="https://pan.baidu.com" target="_blank">百度网盘</a>
-    <a class="link-item" href="https://www.canva.cn" target="_blank">Canva</a>
-    <a class="link-item" href="https://www.notion.so" target="_blank">Notion</a>
-    <a class="link-item" href="https://translate.google.cn" target="_blank">谷歌翻译</a>
-    <a class="link-item" href="https://www.remove.bg" target="_blank">去背景</a>
+<div id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">编辑导航</div>
+    <input class="modal-input" id="edit_name" placeholder="导航名称">
+    <input class="modal-input" id="edit_url" placeholder="跳转地址">
+    <input class="modal-input" id="edit_icon" placeholder="自定义图标（如：🚀🔥📘）">
+    <select class="modal-select" id="edit_cid"></select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEdit()">取消</button>
+      <button class="btn-save" onclick="saveEdit()">保存</button>
+    </div>
   </div>
 </div>
 
-<div class="nav-group">
-  <h2>开发</h2>
-  <div class="link-grid">
-    <a class="link-item" href="https://github.com" target="_blank">GitHub</a>
-    <a class="link-item" href="https://codepen.io" target="_blank">CodePen</a>
-    <a class="link-item" href="https://developer.mozilla.org" target="_blank">MDN</a>
-    <a class="link-item" href="https://www.runoob.com" target="_blank">菜鸟教程</a>
+<div id="maintain">
+  <div class="maintain-box">
+    <div class="maintain-icon">🔧</div>
+    <div class="maintain-title" id="mt_title">系统维护中</div>
+    <div class="maintain-desc" id="mt_desc">为提供更稳定的服务，系统正在升级维护。</div>
+    <button id="adminLoginBtnInMaintain" onclick="show('login')">⚙️</button>
+    <div class="maintain-footer" id="maintain_copyright"></div>
   </div>
+</div>
+
+<div id="login">
+  <button class="admin-icon-btn" id="adminLoginBtn">⚙️</button>
+  <div class="login-title">🔐 安全登录</div>
+  <input type="password" class="login-input" id="pwd" placeholder="请输入登录密码">
+  <div class="remember-row">
+    <input type="checkbox" id="rememberPwd">
+    <label for="rememberPwd">记住密码</label>
+  </div>
+  <button class="btn btn-primary" id="userLoginBtn">登录</button>
+  <div class="login-footer" id="login_copyright"></div>
+</div>
+
+<div id="home">
+  <div class="head">
+    <div class="head-title">🧭 导航菜单</div>
+    <div class="back-btn" onclick="showLogin()">返回</div>
+  </div>
+  <div id="lineList"></div>
+  <div class="home-footer" id="home_copyright"></div>
+</div>
+
+<div id="admin">
+  <div class="head">
+    <div class="head-title">⚙️ 管理后台</div>
+    <div class="back-btn" onclick="showLogin()">返回</div>
+  </div>
+
+  <!-- ====================== 数据备份与还原 ====================== -->
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
+      <span>💾 数据备份与还原</span>
+      <span class="collapse-arrow" id="arr_backupCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="backupCollapse">
+      <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">
+        备份包含：分类、导航、公告、版权、样式全部设置
+      </div>
+      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">
+        💾 导出全部数据备份
+      </button>
+      <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
+      <button class="btn btn-danger" onclick="importBackup()" style="width:100%;">
+        ⚠️ 从备份文件还原数据
+      </button>
+    </div>
+  </div>
+
+  <!-- 分类图标批量更换 -->
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('batchIconCollapse')">
+      <span>🪄 分类图标批量更换</span>
+      <span class="collapse-arrow" id="arr_batchIconCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="batchIconCollapse">
+      <input class="form-input" id="batchCategoryIcon" placeholder="请输入要统一使用的图标，例如 📁">
+      <button class="btn btn-success" onclick="batchUpdateCategoryIcon()" style="width:100%">✅ 一键批量更换</button>
+      <div style="font-size:12px; color:#86909C; margin-top:6px;">提示：将替换所有分类的图标为你输入的内容</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('styleCollapse')">
+      <span>🎨 导航卡片样式</span>
+      <span class="collapse-arrow" id="arr_styleCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="styleCollapse">
+      <select class="form-select" id="cardStyleSelect">
+        <option value="default">默认圆角</option>
+        <option value="round">大圆角</option>
+        <option value="square">直角</option>
+        <option value="flat">简约无边框</option>
+      </select>
+      <div class="form-switch">
+        <input type="checkbox" id="cardIconCenter">
+        <label for="cardIconCenter">图标居中</label>
+      </div>
+      <button class="btn btn-success" onclick="saveCardStyle()" style="width:100%">💾 应用样式</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('logCollapse')">
+      <span>📝 后台登录日志</span>
+      <span class="collapse-arrow" id="arr_logCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="logCollapse">
+      <div id="logList" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; margin-bottom:10px;"></div>
+      <button class="btn btn-danger" onclick="clearAdminLog()" style="width:100%">🗑️ 清空日志</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('noticeCollapse')">
+      <span>📢 公告设置</span>
+      <span class="collapse-arrow" id="arr_noticeCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="noticeCollapse">
+      <div class="form-switch">
+        <input type="checkbox" id="notice_enabled">
+        <label for="notice_enabled">启用公告</label>
+      </div>
+      <input class="form-input" id="notice_title" placeholder="公告标题">
+      <textarea class="form-text" id="notice_text" placeholder="公告内容"></textarea>
+      <button class="btn btn-success" onclick="saveNotice()" style="width:100%">💾 保存公告</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('maintainCollapse')">
+      <span>🛠 维护设置</span>
+      <span class="collapse-arrow" id="arr_maintainCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="maintainCollapse">
+      <input class="form-input" id="set_title" placeholder="维护标题">
+      <textarea class="form-text" id="set_desc" placeholder="维护说明"></textarea>
+      <div style="font-size:12px; color:#86909C; margin:6px 0;">
+        🔒 已开启：维护时<strong>仅管理员可访问</strong>，游客仅看维护页
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="saveSet()">💾 保存</button>
+        <button class="btn btn-primary" onclick="openMt()">🔓 开启维护</button>
+        <button class="btn btn-danger" onclick="closeMt()">🔒 关闭维护</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('pwdCollapse')">
+      <span>🔐 密码管理</span>
+      <span class="collapse-arrow" id="arr_pwdCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="pwdCollapse">
+      <input class="form-input" id="old_pwd" type="password" placeholder="原密码">
+      <input class="form-input" id="new_pwd" type="password" placeholder="新密码">
+      <input class="form-input" id="confirm_pwd" type="password" placeholder="确认新密码">
+      <button class="btn btn-primary" onclick="updatePassword()" style="width:100%">✅ 修改密码</button>
+      <div style="height:8px;"></div>
+      <button class="btn btn-warning" onclick="resetPassword()" style="width:100%">🔄 重置为默认密码</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('categoryCollapse')">
+      <span>📂 分类管理（可隐藏）</span>
+      <span class="collapse-arrow" id="arr_categoryCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="categoryCollapse">
+      <div id="categoryList"></div>
+      <input class="form-input" id="add_category_name" placeholder="分类名称">
+      <input class="form-input" id="add_category_icon" placeholder="分类图标（如：📁💻🎬）">
+      <button class="btn btn-success" onclick="addCategory()" style="width:100%">➕ 添加分类</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('lineCollapse')">
+      <span>🧭 导航管理（可排序/可隐藏）</span>
+      <span class="collapse-arrow" id="arr_lineCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="lineCollapse">
+      <div id="adminLineList"></div>
+      <input class="form-input" id="add_name" placeholder="导航名称">
+      <input class="form-input" id="add_url" placeholder="跳转地址">
+      <input class="form-input" id="add_icon" placeholder="导航图标（如：🚀🔥📘）">
+      <select class="form-select" id="add_cid"></select>
+      <button class="btn btn-success" onclick="addLine()" style="width:100%">➕ 添加导航</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('copyrightCollapse')">
+      <span>ℹ️ 版权信息</span>
+      <span class="collapse-arrow" id="arr_copyrightCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="copyrightCollapse">
+      <input class="form-input" id="copyright_text" placeholder="© 2025 闲时导航 版权所有">
+      <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">💾 保存版权</button>
+    </div>
+  </div>
+
+  <div class="admin-footer" id="admin_copyright"></div>
 </div>
 
 <script>
-  function doSearch() {
-    const val = document.getElementById('searchInput').value.trim();
-    if (val) {
-      window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(val)}`, '_blank');
-    }
-  }
-  document.getElementById('searchInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch();
-  });
-</script>
+function encodeHTML(s) {
+  return s.replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+}
+function safeUrl(url) {
+  try { let u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:' ? url : '#'; } catch { return '#'; }
+}
+function getIP() { return '本地'; }
+function nowStr() { let d = new Date(); return d.toLocaleString(); }
 
+// 管理员登录标识
+function setAdminLoggedIn() { localStorage.setItem('admin_logged', '1'); }
+function isAdminLoggedIn() { return localStorage.getItem('admin_logged') === '1'; }
+function clearAdminLoggedIn() { localStorage.removeItem('admin_logged'); }
+
+const DEFAULT_PWD = "668899";
+function getAdminPwdHash() { return localStorage.getItem('admin_pwd_hash') || md5(DEFAULT_PWD); }
+function setAdminPwdHash(hash) { localStorage.setItem('admin_pwd_hash', hash); }
+
+let cardStyle = localStorage.getItem('cardStyle') || 'default';
+let cardIconCenter = localStorage.getItem('cardIconCenter') === 'true';
+
+let maintainMode = localStorage.getItem('maintain') === '1';
+let mt_title = localStorage.getItem('mt_title') || '系统维护中';
+let mt_desc  = localStorage.getItem('mt_desc')  || '为提供更稳定的服务，系统正在升级维护。';
+
+let notice_enabled = localStorage.getItem('notice_enabled') !== 'false';
+let notice_title   = localStorage.getItem('notice_title') || '📢 系统公告';
+let notice_text    = localStorage.getItem('notice_text') || '欢迎使用闲时导航';
+
+let copyright_text = localStorage.getItem('copyright_text') || '© 2025 闲时导航 版权所有';
+
+let categories = JSON.parse(localStorage.getItem('categories')) || [
+  { id: 1, name: '默认分类', icon: '📁', hidden: false }
+];
+let lines = JSON.parse(localStorage.getItem('lines')) || [];
+let editIndex = -1;
+const REMEMBER_KEY = "remember_user_pwd";
+
+// ====================== 数据备份 / 还原 ======================
+function exportBackup() {
+  const data = {
+    categories,
+    lines,
+    notice_enabled,
+    notice_title,
+    notice_text,
+    copyright_text,
+    cardStyle,
+    cardIconCenter,
+    maintainMode,
+    mt_title,
+    mt_desc,
+    admin_pwd_hash: getAdminPwdHash()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '导航备份_' + '1900-01-01_00-00-00' + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ 数据备份已导出');
+}
+
+function importBackup() {
+  const input = document.getElementById('restoreFile');
+  if (!input.files || !input.files[0]) {
+    alert('请先选择备份文件');
+    return;
+  }
+  if (!confirm('⚠️ 还原将覆盖全部现有数据，确定继续？')) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      categories = data.categories || categories;
+      lines = data.lines || lines;
+      notice_enabled = data.notice_enabled ?? notice_enabled;
+      notice_title = data.notice_title ?? notice_title;
+      notice_text = data.notice_text ?? notice_text;
+      copyright_text = data.copyright_text ?? copyright_text;
+      cardStyle = data.cardStyle ?? cardStyle;
+      cardIconCenter = data.cardIconCenter ?? cardIconCenter;
+      maintainMode = data.maintainMode ?? maintainMode;
+      mt_title = data.mt_title ?? mt_title;
+      mt_desc = data.mt_desc ?? mt_desc;
+      if (data.admin_pwd_hash) setAdminPwdHash(data.admin_pwd_hash);
+
+      localStorage.setItem('categories', JSON.stringify(categories));
+      localStorage.setItem('lines', JSON.stringify(lines));
+      localStorage.setItem('notice_enabled', notice_enabled);
+      localStorage.setItem('notice_title', notice_title);
+      localStorage.setItem('notice_text', notice_text);
+      localStorage.setItem('copyright_text', copyright_text);
+      localStorage.setItem('cardStyle', cardStyle);
+      localStorage.setItem('cardIconCenter', cardIconCenter);
+      localStorage.setItem('maintain', maintainMode);
+      localStorage.setItem('mt_title', mt_title);
+      localStorage.setItem('mt_desc', mt_desc);
+
+      renderCategoryAdmin();
+      refreshCatSelect();
+      renderHome();
+      renderAdminLine();
+      alert('✅ 数据还原成功，页面已刷新');
+      location.reload();
+    } catch (err) {
+      alert('❌ 备份文件格式错误');
+    }
+  };
+  reader.readAsText(input.files[0]);
+}
+
+// ====================== 分类显示/隐藏 ======================
+function toggleCategoryVisible(index) {
+  categories[index].hidden = !categories[index].hidden;
+  localStorage.setItem('categories', JSON.stringify(categories));
+  renderCategoryAdmin();
+  renderHome();
+}
+
+// ====================== 分类图标批量更换 ======================
+function batchUpdateCategoryIcon() {
+  let ico = document.getElementById('batchCategoryIcon').value.trim();
+  if (!ico) { alert('请输入要批量设置的图标！'); return; }
+  if (!confirm('确定要把【所有分类】图标统一换成：' + ico + ' 吗？')) return;
+  categories.forEach(c => c.icon = ico);
+  localStorage.setItem('categories', JSON.stringify(categories));
+  renderCategoryAdmin(); renderHome();
+  alert('✅ 所有分类图标已批量更换完成！');
+}
+
+// ====================== 登录日志 ======================
+function getAdminLog() {
+  return JSON.parse(localStorage.getItem('admin_login_log') || '[]');
+}
+function addAdminLog(success) {
+  let log = getAdminLog();
+  log.unshift({ time: nowStr(), ip: getIP(), success });
+  if (log.length > 100) log = log.slice(0, 100);
+  localStorage.setItem('admin_login_log', JSON.stringify(log));
+}
+function renderAdminLog() {
+  let log = getAdminLog();
+  let dom = document.getElementById('logList');
+  dom.innerHTML = '';
+  log.forEach(item => {
+    let cls = item.success ? 'log-success' : 'log-fail';
+    let txt = item.success ? '登录成功' : '登录失败';
+    dom.innerHTML += `<div class="log-item"><span class="log-time">${item.time}</span>｜<span class="log-ip">IP: ${item.ip}</span>｜<span class="${cls}">${txt}</span></div>`;
+  });
+}
+function clearAdminLog() {
+  if (!confirm('确定清空所有登录日志？')) return;
+  localStorage.removeItem('admin_login_log');
+  renderAdminLog();
+  alert('✅ 日志已清空');
+}
+
+// ====================== 导航显示/隐藏 ======================
+function toggleLineVisible(index) {
+  lines[index].hidden = !lines[index].hidden;
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome();
+}
+
+function toggleCollapse(id) {
+  let body = document.getElementById(id);
+  let arr  = document.getElementById('arr_'+id);
+  body.classList.toggle('show');
+  arr.innerText = body.classList.contains('show') ? '▼' : '▶';
+}
+
+// ====================== 维护仅管理员可见 ======================
+function show(id) {
+  ['splash','notice','maintain','login','home','admin','editModal'].forEach(i => {
+    document.getElementById(i).style.display = 'none';
+  });
+  if (maintainMode && !isAdminLoggedIn()) {
+    document.getElementById('maintain').style.display = 'flex';
+    return;
+  }
+  if (['splash','notice','maintain','editModal'].includes(id)) {
+    document.getElementById(id).style.display = 'flex';
+  } else {
+    document.getElementById(id).style.display = 'block';
+  }
+  loadAllCopyright();
+  if (id === 'admin') renderAdminLog();
+}
+
+function loadAllCopyright() {
+  const txt = encodeHTML(copyright_text);
+  document.getElementById('splash_copyright').innerText = txt;
+  document.getElementById('notice_copyright').innerText = txt;
+  document.getElementById('maintain_copyright').innerText = txt;
+  document.getElementById('login_copyright').innerText = txt;
+  document.getElementById('home_copyright').innerText = txt;
+  document.getElementById('admin_copyright').innerText = txt;
+}
+
+function saveCardStyle() {
+  cardStyle = document.getElementById('cardStyleSelect').value;
+  cardIconCenter = document.getElementById('cardIconCenter').checked;
+  localStorage.setItem('cardStyle', cardStyle);
+  localStorage.setItem('cardIconCenter', cardIconCenter);
+  renderHome();
+  alert("🎨 卡片样式已应用");
+}
+
+function moveUp(index) { if(index<=0) return; [lines[index-1], lines[index]] = [lines[index], lines[index-1]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
+function moveDown(index) { if(index>=lines.length-1) return; [lines[index], lines[index+1]] = [lines[index+1], lines[index]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
+
+function updatePassword() {
+  let oldPwd = document.getElementById('old_pwd').value.trim();
+  let newPwd = document.getElementById('new_pwd').value.trim();
+  let confirmPwd = document.getElementById('confirm_pwd').value.trim();
+  if(!oldPwd || !newPwd || !confirmPwd) { alert("请填写完整"); return; }
+  if(newPwd !== confirmPwd) { alert("两次新密码不一致"); return; }
+  if(newPwd.length < 4) { alert("密码至少4位"); return; }
+  if(md5(oldPwd) !== getAdminPwdHash()) { alert("原密码不正确"); return; }
+  setAdminPwdHash(md5(newPwd));
+  document.getElementById('old_pwd').value = "";
+  document.getElementById('new_pwd').value = "";
+  document.getElementById('confirm_pwd').value = "";
+  alert("✅ 密码修改成功");
+}
+function resetPassword() {
+  if(!confirm("确定要重置为默认密码？\n默认密码："+DEFAULT_PWD)) return;
+  setAdminPwdHash(md5(DEFAULT_PWD));
+  alert("🔄 已重置为默认密码：\n"+DEFAULT_PWD);
+}
+
+function saveCategories() { localStorage.setItem('categories', JSON.stringify(categories)); }
+
+// 分类列表
+function renderCategoryAdmin() {
+  let dom = document.getElementById('categoryList'); dom.innerHTML = '';
+  categories.forEach((c,i)=>{
+    let icon = encodeHTML(c.icon || '📁');
+    let name = encodeHTML(c.name);
+    let btnText = c.hidden ? '👁️ 显示' : '🙈 隐藏';
+    dom.innerHTML += `
+    <div class="manager-line">
+      <div class="name">${icon} ${name}</div>
+      <div>
+        <button class="btn-toggle" onclick="toggleCategoryVisible(${i})">${btnText}</button>
+        <button class="btn-del" onclick="delCategory(${i})">删除</button>
+      </div>
+    </div>`;
+  });
+}
+
+function addCategory() {
+  let name = document.getElementById('add_category_name').value.trim();
+  let icon = document.getElementById('add_category_icon').value.trim() || '📁';
+  if(!name) { alert("请输入分类名称"); return; }
+  let maxId = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
+  categories.push({id:maxId+1, name, icon, hidden: false});
+  saveCategories();
+  document.getElementById('add_category_name').value = '';
+  document.getElementById('add_category_icon').value = '';
+  renderCategoryAdmin(); refreshCatSelect(); alert("✅ 分类添加成功");
+}
+
+function delCategory(index) {
+  if(categories.length <=1) { alert("至少保留一个分类"); return; }
+  if(!confirm("确定删除？相关导航将移入默认分类")) return;
+  let delId = categories[index].id;
+  categories.splice(index,1);
+  lines.forEach(it=>{ if(it.cid===delId) it.cid = categories[0].id; });
+  saveCategories(); localStorage.setItem('lines', JSON.stringify(lines));
+  renderCategoryAdmin(); refreshCatSelect(); renderAdminLine(); renderHome(); alert("🗑️ 分类已删除");
+}
+
+function refreshCatSelect() {
+  let addSel = document.getElementById('add_cid');
+  let editSel = document.getElementById('edit_cid');
+  addSel.innerHTML = ''; editSel.innerHTML = '';
+  categories.forEach(c=>{
+    let opt = `<option value="${c.id}">${encodeHTML(c.icon||'📁')} ${encodeHTML(c.name)}</option>`;
+    addSel.innerHTML += opt; editSel.innerHTML += opt;
+  });
+}
+
+// 首页只显示未隐藏分类
+function renderHome() {
+  let dom = document.getElementById('lineList'); dom.innerHTML = '';
+  categories.filter(c => !c.hidden).forEach(cat=>{
+    let items = lines.filter(it=>it.cid===cat.id && !it.hidden);
+    if(items.length===0) return;
+    let catIcon = encodeHTML(cat.icon||'📁');
+    let catName = encodeHTML(cat.name);
+    dom.innerHTML += `<div class="category-title">${catIcon} ${catName}</div>`;
+    items.forEach(it=>{
+      let icon = encodeHTML(it.icon||'🔗');
+      let name = encodeHTML(it.name);
+      let url  = safeUrl(it.url);
+      let cls = `nav-card ${cardStyle} ${cardIconCenter ? 'center' : ''}`;
+      dom.innerHTML += `
+        <div class="${cls}" onclick="window.open('${url}','_blank')">
+          <div class="nav-icon">${icon}</div>
+          <div class="nav-text">${name}</div>
+        </div>`;
+    });
+  });
+}
+
+function renderAdminLine() {
+  let dom = document.getElementById('adminLineList'); dom.innerHTML = '';
+  lines.forEach((it,i)=>{
+    let icon = encodeHTML(it.icon||'🔗');
+    let name = encodeHTML(it.name);
+    let cat = categories.find(c=>c.id===it.cid);
+    let catShow = cat ? `${cat.icon||''} ${cat.name}` : '默认';
+    let visText = it.hidden ? '🙈 显示' : '👁️ 隐藏';
+    dom.innerHTML += `
+      <div class="manager-line">
+        <div class="sort-btns">
+          <button onclick="moveUp(${i})">↑</button>
+          <button onclick="moveDown(${i})">↓</button>
+        </div>
+        <div class="name">${icon} ${name} (${catShow})</div>
+        <div>
+          <button class="btn-toggle" onclick="toggleLineVisible(${i})">${visText}</button>
+          <button class="btn-edit" onclick="openEdit(${i})">修改</button>
+          <button class="btn-del" onclick="delLine(${i})">删除</button>
+        </div>
+      </div>`;
+  });
+}
+
+function addLine() {
+  let n = document.getElementById('add_name').value.trim();
+  let u = document.getElementById('add_url').value.trim();
+  let ic= document.getElementById('add_icon').value.trim() || '🔗';
+  let cid= parseInt(document.getElementById('add_cid').value);
+  if(!n || !u) { alert("名称和地址不能为空"); return; }
+  lines.push({name:n, url:u, icon:ic, cid, hidden:false});
+  localStorage.setItem('lines', JSON.stringify(lines));
+  document.getElementById('add_name').value = '';
+  document.getElementById('add_url').value = '';
+  document.getElementById('add_icon').value = '';
+  renderAdminLine(); renderHome(); alert("✅ 添加导航成功");
+}
+function openEdit(i) {
+  if(i<0||i>=lines.length) return;
+  editIndex = i;
+  let it = lines[i];
+  document.getElementById('edit_name').value = it.name||'';
+  document.getElementById('edit_url').value = it.url||'';
+  document.getElementById('edit_icon').value = it.icon||'';
+  document.getElementById('edit_cid').value = it.cid;
+  document.getElementById('editModal').style.display = 'flex';
+}
+function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
+function saveEdit() {
+  let n = document.getElementById('edit_name').value.trim();
+  let u = document.getElementById('edit_url').value.trim();
+  let ic= document.getElementById('edit_icon').value.trim() || '🔗';
+  let cid= parseInt(document.getElementById('edit_cid').value);
+  if(!n || !u) { alert("不能为空"); return; }
+  lines[editIndex] = {...lines[editIndex], name:n, url:u, icon:ic, cid};
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome(); closeEdit(); alert("✅ 修改成功");
+}
+function delLine(i) {
+  if(!confirm("确定删除该导航？")) return;
+  lines.splice(i,1);
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome(); alert("🗑️ 删除成功");
+}
+
+function closeNotice() { show('login'); }
+function saveCopyright() {
+  let txt = document.getElementById('copyright_text').value.trim();
+  if(!txt) { alert("请输入版权信息"); return; }
+  localStorage.setItem('copyright_text', txt);
+  copyright_text = txt;
+  loadAllCopyright(); alert("✅ 版权已保存");
+}
+function saveNotice() {
+  let en = document.getElementById('notice_enabled').checked;
+  let t = document.getElementById('notice_title').value.trim();
+  let c = document.getElementById('notice_text').value.trim();
+  if(!t || !c) { alert("标题和内容不能为空"); return; }
+  localStorage.setItem('notice_enabled', en);
+  localStorage.setItem('notice_title', t);
+  localStorage.setItem('notice_text', c);
+  notice_enabled = en; notice_title = t; notice_text = c;
+  alert("✅ 公告已保存");
+}
+function saveSet() {
+  localStorage.setItem('mt_title', document.getElementById('set_title').value);
+  localStorage.setItem('mt_desc',  document.getElementById('set_desc').value);
+  mt_title = document.getElementById('set_title').value;
+  mt_desc  = document.getElementById('set_desc').value;
+  document.getElementById('mt_title').innerText = encodeHTML(mt_title);
+  document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
+  alert("✅ 维护信息已保存");
+}
+
+function openMt() {
+  localStorage.setItem('maintain','1');
+  maintainMode = true;
+  show('maintain');
+  alert("🔒 已开启维护模式（仅管理员可访问）");
+}
+
+function closeMt() {
+  localStorage.setItem('maintain','0');
+  maintainMode = false;
+  show('home');
+  alert("🔓 已关闭维护，所有人可正常访问");
+}
+
+function loadRememberedPwd() {
+  if(localStorage.getItem(REMEMBER_KEY)==="true") {
+    document.getElementById('pwd').value = DEFAULT_PWD;
+    document.getElementById('rememberPwd').checked = true;
+  }
+}
+function showLogin() {
+  document.getElementById('pwd').value = '';
+  document.getElementById('rememberPwd').checked = false;
+  loadRememberedPwd();
+  show('login');
+}
+
+document.getElementById('userLoginBtn').onclick = ()=>{
+  let inputPwd = document.getElementById('pwd').value.trim();
+  let ok = md5(inputPwd) === getAdminPwdHash();
+  addAdminLog(ok);
+  if(!ok) { alert("密码错误"); return; }
+  setAdminLoggedIn();
+  localStorage.setItem(REMEMBER_KEY, document.getElementById('rememberPwd').checked ? "true" : "false");
+  show('home');
+};
+
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  let inputPwd = document.getElementById('pwd').value.trim();
+  let ok = md5(inputPwd) === getAdminPwdHash();
+  addAdminLog(ok);
+  if(!ok) { alert("密码错误"); return; }
+  setAdminLoggedIn();
+  show('admin');
+};
+
+function init() {
+  document.getElementById('mt_title').innerText = encodeHTML(mt_title);
+  document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
+  document.getElementById('notice_enabled').checked = notice_enabled;
+  document.getElementById('notice_title').value = notice_title;
+  document.getElementById('notice_text').value = notice_text;
+  document.getElementById('copyright_text').value = copyright_text;
+  document.getElementById('cardStyleSelect').value = cardStyle;
+  document.getElementById('cardIconCenter').checked = cardIconCenter;
+
+  renderCategoryAdmin(); refreshCatSelect(); renderHome(); renderAdminLine();
+  loadRememberedPwd(); loadAllCopyright();
+
+  setTimeout(()=>{
+    if (maintainMode) {
+      show('maintain');
+    } else {
+      show(notice_enabled ? 'notice' : 'home');
+    }
+    if (!maintainMode && notice_enabled) {
+      document.getElementById('notice_content').innerText = notice_text;
+    }
+  },900);
+}
+init();
+</script>
 </body>
 </html>

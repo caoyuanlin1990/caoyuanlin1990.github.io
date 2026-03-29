@@ -180,7 +180,7 @@ html,body {
     <div class="notice-title">📢 系统公告</div>
     <div class="notice-content" id="notice_content"></div>
     <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
-    <div class="notice-footer" id="notice_copyright"></div>
+    <div class="notice_copyright" id="notice_copyright"></div>
   </div>
 </div>
 
@@ -204,7 +204,7 @@ html,body {
     <div class="maintain-title" id="mt_title">系统维护中</div>
     <div class="maintain-desc" id="mt_desc">升级维护中</div>
     <button id="adminLoginBtnInMaintain" onclick="show('login')">⚙️</button>
-    <div class="maintain-footer" id="maintain_copyright"></div>
+    <div class="maintain_copyright" id="maintain_copyright"></div>
   </div>
 </div>
 
@@ -217,7 +217,7 @@ html,body {
     <label for="rememberPwd">记住密码</label>
   </div>
   <button class="btn btn-primary" id="userLoginBtn">登录</button>
-  <div class="login-footer" id="login_copyright"></div>
+  <div class="login_copyright" id="login_copyright"></div>
 </div>
 
 <div id="home">
@@ -386,8 +386,8 @@ html,body {
 // ==============================================
 const GIST_ID        = "29fbb5f067281c0e42cab753608122a1";
 const GITHUB_TOKEN   = "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";
-// 你的网络备份地址
-const NET_BACKUP_URL = "https://ru.xiaohe1999.dpdns.org/raw/nav-backup-1774766170141.txt";
+// 你的跨域可用的 GitHub Raw 备份地址
+const NET_BACKUP_URL = "https://raw.githubusercontent.com/caoyuanlin1990/caoyuanlin1990.github.io/refs/heads/main/nav-backup-1774766170141.txt";
 
 function encodeHTML(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -418,7 +418,7 @@ let lines           = JSON.parse(localStorage.getItem('lines')) || [];
 let editIndex       = -1;
 
 // ==============================================
-// 新增：网络备份一键恢复核心方法
+// 网络备份一键恢复核心方法
 // ==============================================
 async function restoreFromNetBackup() {
   if(!confirm('确定从网络地址恢复备份？将覆盖本地所有数据！')) return;
@@ -435,7 +435,7 @@ async function restoreFromNetBackup() {
   }
 }
 
-// 新增：恢复网络备份并自动同步到Gist
+// 恢复网络备份并自动同步到Gist
 async function restoreFromNetBackupAndPush() {
   if(!confirm('确定从网络恢复并同步到Gist？将覆盖本地和云端所有数据！')) return;
   try {

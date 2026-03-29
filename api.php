@@ -1,11 +1,10 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST');
-header('Access-Control-Allow-Headers: Content-Type');
 
 $dataFile = 'nav_data.json';
 
+// 读取数据
 function loadData() {
     global $dataFile;
     if (!file_exists($dataFile)) {
@@ -28,6 +27,7 @@ function loadData() {
     return json_decode(file_get_contents($dataFile), true);
 }
 
+// 保存数据
 function saveData($data) {
     global $dataFile;
     file_put_contents($dataFile, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
@@ -37,19 +37,19 @@ $action = $_GET['action'] ?? '';
 $data = loadData();
 
 switch ($action) {
+    // 读取全部
     case 'get':
         echo json_encode($data);
         break;
+    
+    // 保存全部
     case 'save':
         $post = json_decode(file_get_contents('php://input'), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo json_encode(["error" => "数据格式错误"]);
-            exit;
-        }
         saveData(array_merge($data, $post));
         echo json_encode(["ok" => true]);
         break;
+    
     default:
-        echo json_encode(["error" => "无效操作"]);
+        echo json_encode(["error" => "未知操作"]);
 }
 ?>

@@ -1,326 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
 <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">极简
-   <!-- 引入图标库 --><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css<style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", "Microsoft YaHei", Roboto, sans-serif;
-            transition: all 0.3s ease;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的导航页</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    background: #f5f7fa;
+    color: #333;
+    padding: 2rem 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .title {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #222;
+  }
+  .search-box {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .search-box input {
+    flex: 1;
+    padding: 0.9rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .search-box button {
+    padding: 0.9rem 1.4rem;
+    border: none;
+    border-radius: 12px;
+    background: #409eff;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .search-box button:hover {
+    background: #338eef;
+  }
+  .nav-group {
+    margin-bottom: 2rem;
+  }
+  .nav-group h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #555;
+    font-weight: 500;
+  }
+  .link-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  .link-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: 0.2s;
+  }
+  .link-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    color: #409eff;
+  }
+</style>
+</head>
+<body>
 
-        /* 浅色模式默认样式 */
-        :root {
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-hover-bg: rgba(255, 255, 255, 0.95);
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --search-bg: rgba(255, 255, 255, 0.9);
-            --search-border: #e2e8f0;
-            --btn-bg: linear-gradient(135deg, #409eff 0%, #2f80ed 100%);
-            --shadow-light: 0 8px 20px rgba(0, 0, 0, 0.08);
-            --shadow-heavy: 0 12px 30px rgba(0, 0, 0, 0.12);
-        }
+<div class="title">我的导航页</div>
 
-        /* 深色模式变量 */
-        .dark-mode {
-            --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            --card-bg: rgba(45, 55, 72, 0.8);
-            --card-hover-bg: rgba(60, 70, 88, 0.9);
-            --text-primary: #f7fafc;
-            --text-secondary: #cbd5e0;
-            --search-bg: rgba(45, 55, 72, 0.9);
-            --search-border: #4a5568;
-            --btn-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow-light: 0 8px 20px rgba(0, 0, 0, 0.2);
-            --shadow-heavy: 0 12px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            color: var(--text-primary);
-            padding: 3rem 1.5rem;
-            max-width: 1100px;
-            margin: 0 auto;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* 深色模式切换按钮 */
-        .theme-toggle {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-light);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(15deg) scale(1.05);
-            box-shadow: var(--shadow-heavy);
-        }
-
-        /* 页面标题 */
-        .page-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: var(--btn-bg);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 3rem;
-            font-weight: 400;
-        }
-
-        /* 搜索框样式 */
-        .search-container {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 4rem;
-            background: var(--search-bg);
-            padding: 0.8rem 1rem;
-            border-radius: 24px;
-            box-shadow: var(--shadow-light);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--search-border);
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: none;
-            background: transparent;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            outline: none;
-        }
-
-        .search-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .search-btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 20px;
-            background: var(--btn-bg);
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            box-shadow: var(--shadow-light);
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-heavy);
-        }
-
-        /* 导航分类样式 */
-        .nav-section {
-            margin-bottom: 3.5rem;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .section-title i {
-            color: #409eff;
-            font-size: 1.4rem;
-        }
-
-        /* 链接网格布局 */
-        .link-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1.2rem;
-        }
-
-        /* 导航卡片样式 */
-        .nav-card {
-            background: var(--card-bg);
-            padding: 1.5rem 1rem;
-            border-radius: 16px;
-            text-align: center;
-            text-decoration: none;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-light);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .nav-card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: var(--shadow-heavy);
-            background: var(--card-hover-bg);
-        }
-
-        .nav-card i {
-            font-size: 1.8rem;
-            background: var(--btn-bg);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-card span {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        /* 响应式适配 */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .link-grid {
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            }
-
-            .theme-toggle {
-                top: 1.5rem;
-                right: 1.5rem;
-                width: 40px;
-                height: 40px;
-            }
-
-            body {
-                padding: 2rem 1rem;
-            }
-        }</style>
-<body><!-- 深色模式切换按钮 -->
-    <button class="theme-toggle" id="themeBtn">
-<i class="fas</i></button>
-
-<!-- 页面标题 --><h1 class="page-title">极简导航</h1>
-   <p class="subtitle">一站式快捷访问，高效上网<!-- 搜索框 -->
-   <div class="search-container<input type="text" class="search-input" id="searchInput" placeholder="输入关键词，百度一下">
-        <button class="search-btn" onclick="searchWeb()">
-<i class="fas</i> </button></div>
-
-<!-- 常用网站 --><div class="nav-section">
-        <h2 class="section-title<i class="fas fa</i> 常用</h2>
-<div class="link-grid">
-            <a href="https://www.baidu.com" target="_blank" class="nav-card"><i class="fab fa-brands fa-fire</i>
-                <span>百度</span>
-            <a href="https://www.bilibili.com" target="_blank" class="nav-card"><i class="fab fa-bilibili"><span</span>
-</a>
-           <a href="https://www.zhihu.com" target="_blank" class="nav-card">
-                <i class="fab fa-</i>
-                <span>知乎</span>
-            <a href="https://weibo.com" target="_blank" class="nav-card">
-               <i class="fab fa</i>
-                <span>微博</span>
-            <a href="https://www.douban.com" target="_blank" class="nav-card"><i class="fab fa-douban"><span</span>
-</a>
-           <a href="https://www.163.com" target="_blank" class="nav-card">
-               <i class="fas fa</i>
-                <span>网易</span>
-            </div></div>
-
-<!-- 实用工具 --><div class="nav-section">
-        <h2 class="section-title<i class="fas fa</i> </h2><div class="link-grid">
-            <a href="https://pan.baidu.com" target="_blank" class="nav-card<i class="fas fa-cloud"><span></span>
-</a>
-           <a href="https://www.aliyundrive.com" target="_blank" class="nav-card">
-<i class="fas fa-cloud-drive"><span></span>
-</a>
-           <a href="https://translate.google.cn" target="_blank" class="nav-card<i class="fas fa-language"><span></span>
-</a>
-           <a href="https://www.canva.cn" target="_blank" class="nav-card">
-                <i class="fas fa-palette"></i>
-                <span>Canva设计</span>
-            <a href="https://www.notion.so" target="_blank" class="nav-card">
-<i class="fas fa-note-sticky"><span</span></a>
-<a href="https://www.remove.bg" target="_blank" class="nav-card">
-                <i class="fas fa-image"><span</span</a></div>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="百度搜索...">
+  <button onclick="doSearch()">搜索</button>
 </div>
 
-   <!-- 学习开发 -->
-<div class="nav<h2 class="section-title"><i class="fas fa-code</i> 学习开发</h2>
-       <div class="link-grid<a href="https://github.com" target="_blank" class="nav-card">
-                <i class="fab fa-g</i>
-               </span</a><a href="https://developer.mozilla.org" target="_blank" class="nav-card">
-                <i class="fas fa-book"></i>
-                <span>MDN文档</span>
-            <a href="https://www.runoob.com" target="_blank" class="nav-card"><i class="fas fa-graduation-cap"></i>
-                </span</a><a href="https://codepen.io" target="_blank" class="nav-card">
-                <i class="fas fa-code"></i>
-                </span</a></div>
+<div class="nav-group">
+  <h2>常用</h2>
+  <div class="link-grid">
+    <a class="link-item" href="https://www.baidu.com" target="_blank">百度</a>
+    <a class="link-item" href="https://www.bilibili.com" target="_blank">B站</a>
+    <a class="link-item" href="https://www.zhihu.com" target="_blank">知乎</a>
+    <a class="link-item" href="https://www.douban.com" target="_blank">豆瓣</a>
+    <a class="link-item" href="https://www.163.com" target="_blank">网易</a>
+    <a class="link-item" href="https://weibo.com" target="_blank">微博</a>
+  </div>
 </div>
 
-   <script>
-        // 搜索功能
-        function searchWeb() {
-            const keyWord = document.getElementById('searchInput').value.trim();
-            if (keyWord) {
-                window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(keyWord)}`, '_blank');
-            }
-        }
+<div class="nav-group">
+  <h2>工具</h2>
+  <div class="link-grid">
+    <a class="link-item" href="https://www.aliyundrive.com" target="_blank">阿里云盘</a>
+    <a class="link-item" href="https://pan.baidu.com" target="_blank">百度网盘</a>
+    <a class="link-item" href="https://www.canva.cn" target="_blank">Canva</a>
+    <a class="link-item" href="https://www.notion.so" target="_blank">Notion</a>
+    <a class="link-item" href="https://translate.google.cn" target="_blank">谷歌翻译</a>
+    <a class="link-item" href="https://www.remove.bg" target="_blank">去背景</a>
+  </div>
+</div>
 
-        // 回车触发搜索
-        document.getElementById('searchInput').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                searchWeb();
-            }
-        });
+<div class="nav-group">
+  <h2>开发</h2>
+  <div class="link-grid">
+    <a class="link-item" href="https://github.com" target="_blank">GitHub</a>
+    <a class="link-item" href="https://codepen.io" target="_blank">CodePen</a>
+    <a class="link-item" href="https://developer.mozilla.org" target="_blank">MDN</a>
+    <a class="link-item" href="https://www.runoob.com" target="_blank">菜鸟教程</a>
+  </div>
+</div>
 
-        // 深色模式切换
-        const themeBtn = document.getElementById('themeBtn');
-        const body = document.body;
-        const themeIcon = themeBtn.querySelector('i');
+<script>
+  function doSearch() {
+    const val = document.getElementById('searchInput').value.trim();
+    if (val) {
+      window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(val)}`, '_blank');
+    }
+  }
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+</script>
 
-        // 读取本地存储的主题
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
-            themeIcon.className = 'fas fa-sun';
-        }
-
-        themeBtn.addEventListener('click', function () {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                themeIcon.className = 'fas fa-sun';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                themeIcon.className = 'fas fa-moon';
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    </script>
+</body>
 </html>

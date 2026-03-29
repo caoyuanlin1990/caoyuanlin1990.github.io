@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>闲时导航 - 云同步版</title>
+<title>闲时导航 - 专业稳定导航系统</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
 * {
@@ -216,12 +216,13 @@ html, body {
 .log-success { color: var(--success); }
 </style>
 </head>
+
 <body>
 
 <div id="splash">
   <div class="splash-icon">🧭</div>
   <div class="splash-title">闲时导航</div>
-  <div class="splash-desc">云同步 · 多设备通用 · 永不丢失</div>
+  <div class="splash-desc">专业稳定 · 安全快捷 · 持续可用</div>
   <div class="splash-footer" id="splash_copyright"></div>
 </div>
 
@@ -287,15 +288,19 @@ html, body {
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
-      <span>☁️ 云同步（自动保存）</span>
+      <span>💾 数据备份与还原</span>
       <span class="collapse-arrow" id="arr_backupCollapse">▶</span>
     </div>
     <div class="collapse-body" id="backupCollapse">
       <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">
-        所有配置自动云同步，换浏览器/换设备都不会丢失
+        备份包含：分类、导航、公告、版权、样式全部设置
       </div>
-      <button class="btn btn-success" onclick="alert('✅ 已自动云同步，无需手动备份')" style="width:100%">
-        ☁️ 查看同步状态
+      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">
+        💾 导出全部数据备份
+      </button>
+      <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
+      <button class="btn btn-danger" onclick="importBackup()" style="width:100%;">
+        ⚠️ 从备份文件还原数据
       </button>
     </div>
   </div>
@@ -436,39 +441,12 @@ html, body {
 </div>
 
 <script>
-const CLOUD_JSON_URL = "https://api.jsonbin.io/v3/b/67f1234567890123456789ab";
-const CLOUD_SECRET = "$2b$12$XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-
-let allConfig = {};
-
-async function loadCloudConfig() {
-  try {
-    let res = await fetch(CLOUD_JSON_URL, {
-      headers: { "X-Access-Key": CLOUD_SECRET }
-    });
-    let data = await res.json();
-    allConfig = data.record || {};
-    return true;
-  } catch(e) {
-    return false;
-  }
-}
-
-async function saveCloudConfig() {
-  try {
-    await fetch(CLOUD_JSON_URL, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Access-Key": CLOUD_SECRET
-      },
-      body: JSON.stringify(allConfig)
-    });
-  } catch(e) {}
-}
-
 function encodeHTML(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
 }
 function safeUrl(url) {
   try { let u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:' ? url : '#'; } catch { return '#'; }
@@ -476,82 +454,112 @@ function safeUrl(url) {
 function getIP() { return '本地'; }
 function nowStr() { let d = new Date(); return d.toLocaleString(); }
 
-function setAdminLoggedIn() { allConfig.admin_logged = '1'; saveCloudConfig(); }
-function isAdminLoggedIn() { return allConfig.admin_logged === '1'; }
-function clearAdminLoggedIn() { delete allConfig.admin_logged; saveCloudConfig(); }
+function setAdminLoggedIn() { localStorage.setItem('admin_logged', '1'); }
+function isAdminLoggedIn() { return localStorage.getItem('admin_logged') === '1'; }
+function clearAdminLoggedIn() { localStorage.removeItem('admin_logged'); }
 
 const DEFAULT_PWD = "668899";
-function getAdminPwdHash() { return allConfig.admin_pwd_hash || md5(DEFAULT_PWD); }
-function setAdminPwdHash(hash) { allConfig.admin_pwd_hash = hash; saveCloudConfig(); }
+function getAdminPwdHash() { return localStorage.getItem('admin_pwd_hash') || md5(DEFAULT_PWD); }
+function setAdminPwdHash(hash) { localStorage.setItem('admin_pwd_hash', hash); }
 
-Object.defineProperty(window, 'cardStyle', {
-  get() { return allConfig.cardStyle || 'default'; },
-  set(v) { allConfig.cardStyle = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'cardIconCenter', {
-  get() { return allConfig.cardIconCenter === true; },
-  set(v) { allConfig.cardIconCenter = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'maintainMode', {
-  get() { return allConfig.maintain === '1'; },
-  set(v) { allConfig.maintain = v ? '1' : '0'; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'mt_title', {
-  get() { return allConfig.mt_title || '系统维护中'; },
-  set(v) { allConfig.mt_title = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'mt_desc', {
-  get() { return allConfig.mt_desc || '为提供更稳定的服务，系统正在升级维护。'; },
-  set(v) { allConfig.mt_desc = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'notice_enabled', {
-  get() { return allConfig.notice_enabled !== false; },
-  set(v) { allConfig.notice_enabled = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'notice_title', {
-  get() { return allConfig.notice_title || '📢 系统公告'; },
-  set(v) { allConfig.notice_title = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'notice_text', {
-  get() { return allConfig.notice_text || '欢迎使用闲时导航'; },
-  set(v) { allConfig.notice_text = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'copyright_text', {
-  get() { return allConfig.copyright_text || '© 2025 闲时导航 版权所有'; },
-  set(v) { allConfig.copyright_text = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'categories', {
-  get() {
-    if (!allConfig.categories) {
-      allConfig.categories = [{ id: 1, name: '默认分类', icon: '📁', hidden: false }];
-      saveCloudConfig();
-    }
-    return allConfig.categories;
-  },
-  set(v) { allConfig.categories = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'lines', {
-  get() { return allConfig.lines || (allConfig.lines = []); },
-  set(v) { allConfig.lines = v; saveCloudConfig(); }
-});
-Object.defineProperty(window, 'admin_login_log', {
-  get() { return allConfig.admin_login_log || []; },
-  set(v) { allConfig.admin_login_log = v; saveCloudConfig(); }
-});
+let cardStyle = localStorage.getItem('cardStyle') || 'default';
+let cardIconCenter = localStorage.getItem('cardIconCenter') === 'true';
 
+let maintainMode = localStorage.getItem('maintain') === '1';
+let mt_title = localStorage.getItem('mt_title') || '系统维护中';
+let mt_desc  = localStorage.getItem('mt_desc')  || '为提供更稳定的服务，系统正在升级维护。';
+
+let notice_enabled = localStorage.getItem('notice_enabled') !== 'false';
+let notice_title   = localStorage.getItem('notice_title') || '📢 系统公告';
+let notice_text    = localStorage.getItem('notice_text') || '欢迎使用闲时导航';
+
+let copyright_text = localStorage.getItem('copyright_text') || '© 2025 闲时导航 版权所有';
+
+let categories = JSON.parse(localStorage.getItem('categories')) || [
+  { id: 1, name: '默认分类', icon: '📁', hidden: false }
+];
+let lines = JSON.parse(localStorage.getItem('lines')) || [];
 let editIndex = -1;
 const REMEMBER_KEY = "remember_user_pwd";
 
 function exportBackup() {
-  alert("✅ 已自动云同步，无需备份");
+  const data = {
+    categories,
+    lines,
+    notice_enabled,
+    notice_title,
+    notice_text,
+    copyright_text,
+    cardStyle,
+    cardIconCenter,
+    maintainMode,
+    mt_title,
+    mt_desc,
+    admin_pwd_hash: getAdminPwdHash()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '导航备份_' + new Date().toISOString().replace(/[:.]/g,'-') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('✅ 数据备份已导出');
 }
+
 function importBackup() {
-  alert("✅ 云同步版无需手动还原");
+  const input = document.getElementById('restoreFile');
+  if (!input.files || !input.files[0]) {
+    alert('请先选择备份文件');
+    return;
+  }
+  if (!confirm('⚠️ 还原将覆盖全部现有数据，确定继续？')) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      categories = data.categories || categories;
+      lines = data.lines || lines;
+      notice_enabled = data.notice_enabled ?? notice_enabled;
+      notice_title = data.notice_title ?? notice_title;
+      notice_text = data.notice_text ?? notice_text;
+      copyright_text = data.copyright_text ?? copyright_text;
+      cardStyle = data.cardStyle ?? cardStyle;
+      cardIconCenter = data.cardIconCenter ?? cardIconCenter;
+      maintainMode = data.maintainMode ?? maintainMode;
+      mt_title = data.mt_title ?? mt_title;
+      mt_desc = data.mt_desc ?? mt_desc;
+      if (data.admin_pwd_hash) setAdminPwdHash(data.admin_pwd_hash);
+
+      localStorage.setItem('categories', JSON.stringify(categories));
+      localStorage.setItem('lines', JSON.stringify(lines));
+      localStorage.setItem('notice_enabled', notice_enabled);
+      localStorage.setItem('notice_title', notice_title);
+      localStorage.setItem('notice_text', notice_text);
+      localStorage.setItem('copyright_text', copyright_text);
+      localStorage.setItem('cardStyle', cardStyle);
+      localStorage.setItem('cardIconCenter', cardIconCenter);
+      localStorage.setItem('maintain', maintainMode);
+      localStorage.setItem('mt_title', mt_title);
+      localStorage.setItem('mt_desc', mt_desc);
+
+      renderCategoryAdmin();
+      refreshCatSelect();
+      renderHome();
+      renderAdminLine();
+      alert('✅ 数据还原成功，页面已刷新');
+      location.reload();
+    } catch (err) {
+      alert('❌ 备份文件格式错误');
+    }
+  };
+  reader.readAsText(input.files[0]);
 }
 
 function toggleCategoryVisible(index) {
   categories[index].hidden = !categories[index].hidden;
-  categories = categories;
+  localStorage.setItem('categories', JSON.stringify(categories));
   renderCategoryAdmin();
   renderHome();
 }
@@ -561,18 +569,19 @@ function batchUpdateCategoryIcon() {
   if (!ico) { alert('请输入要批量设置的图标！'); return; }
   if (!confirm('确定要把【所有分类】图标统一换成：' + ico + ' 吗？')) return;
   categories.forEach(c => c.icon = ico);
-  categories = categories;
-  renderCategoryAdmin();
-  renderHome();
+  localStorage.setItem('categories', JSON.stringify(categories));
+  renderCategoryAdmin(); renderHome();
   alert('✅ 所有分类图标已批量更换完成！');
 }
 
-function getAdminLog() { return admin_login_log; }
+function getAdminLog() {
+  return JSON.parse(localStorage.getItem('admin_login_log') || '[]');
+}
 function addAdminLog(success) {
   let log = getAdminLog();
   log.unshift({ time: nowStr(), ip: getIP(), success });
   if (log.length > 100) log = log.slice(0, 100);
-  admin_login_log = log;
+  localStorage.setItem('admin_login_log', JSON.stringify(log));
 }
 function renderAdminLog() {
   let log = getAdminLog();
@@ -586,16 +595,15 @@ function renderAdminLog() {
 }
 function clearAdminLog() {
   if (!confirm('确定清空所有登录日志？')) return;
-  admin_login_log = [];
+  localStorage.removeItem('admin_login_log');
   renderAdminLog();
   alert('✅ 日志已清空');
 }
 
 function toggleLineVisible(index) {
   lines[index].hidden = !lines[index].hidden;
-  lines = lines;
-  renderAdminLine();
-  renderHome();
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome();
 }
 
 function toggleCollapse(id) {
@@ -635,24 +643,14 @@ function loadAllCopyright() {
 function saveCardStyle() {
   cardStyle = document.getElementById('cardStyleSelect').value;
   cardIconCenter = document.getElementById('cardIconCenter').checked;
+  localStorage.setItem('cardStyle', cardStyle);
+  localStorage.setItem('cardIconCenter', cardIconCenter);
   renderHome();
-  alert("🎨 卡片样式已云同步");
+  alert("🎨 卡片样式已应用");
 }
 
-function moveUp(index) {
-  if(index<=0) return;
-  [lines[index-1], lines[index]] = [lines[index], lines[index-1]];
-  lines = lines;
-  renderAdminLine();
-  renderHome();
-}
-function moveDown(index) {
-  if(index>=lines.length-1) return;
-  [lines[index], lines[index+1]] = [lines[index+1], lines[index]];
-  lines = lines;
-  renderAdminLine();
-  renderHome();
-}
+function moveUp(index) { if(index<=0) return; [lines[index-1], lines[index]] = [lines[index], lines[index-1]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
+function moveDown(index) { if(index>=lines.length-1) return; [lines[index], lines[index+1]] = [lines[index+1], lines[index]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
 
 function updatePassword() {
   let oldPwd = document.getElementById('old_pwd').value.trim();
@@ -666,13 +664,15 @@ function updatePassword() {
   document.getElementById('old_pwd').value = "";
   document.getElementById('new_pwd').value = "";
   document.getElementById('confirm_pwd').value = "";
-  alert("✅ 密码已云同步保存");
+  alert("✅ 密码修改成功");
 }
 function resetPassword() {
   if(!confirm("确定要重置为默认密码？\n默认密码："+DEFAULT_PWD)) return;
   setAdminPwdHash(md5(DEFAULT_PWD));
   alert("🔄 已重置为默认密码：\n"+DEFAULT_PWD);
 }
+
+function saveCategories() { localStorage.setItem('categories', JSON.stringify(categories)); }
 
 function renderCategoryAdmin() {
   let dom = document.getElementById('categoryList'); dom.innerHTML = '';
@@ -696,31 +696,21 @@ function addCategory() {
   let icon = document.getElementById('add_category_icon').value.trim() || '📁';
   if(!name) { alert("请输入分类名称"); return; }
   let maxId = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
-  let arr = categories;
-  arr.push({id:maxId+1, name, icon, hidden: false});
-  categories = arr;
+  categories.push({id:maxId+1, name, icon, hidden: false});
+  saveCategories();
   document.getElementById('add_category_name').value = '';
   document.getElementById('add_category_icon').value = '';
-  renderCategoryAdmin();
-  refreshCatSelect();
-  alert("✅ 分类添加成功（已云同步）");
+  renderCategoryAdmin(); refreshCatSelect(); alert("✅ 分类添加成功");
 }
 
 function delCategory(index) {
   if(categories.length <=1) { alert("至少保留一个分类"); return; }
   if(!confirm("确定删除？相关导航将移入默认分类")) return;
   let delId = categories[index].id;
-  let arr = categories;
-  arr.splice(index,1);
-  categories = arr;
-  let lineArr = lines;
-  lineArr.forEach(it=>{ if(it.cid===delId) it.cid = categories[0].id; });
-  lines = lineArr;
-  renderCategoryAdmin();
-  refreshCatSelect();
-  renderAdminLine();
-  renderHome();
-  alert("🗑️ 分类已删除");
+  categories.splice(index,1);
+  lines.forEach(it=>{ if(it.cid===delId) it.cid = categories[0].id; });
+  saveCategories(); localStorage.setItem('lines', JSON.stringify(lines));
+  renderCategoryAdmin(); refreshCatSelect(); renderAdminLine(); renderHome(); alert("🗑️ 分类已删除");
 }
 
 function refreshCatSelect() {
@@ -785,15 +775,12 @@ function addLine() {
   let ic= document.getElementById('add_icon').value.trim() || '🔗';
   let cid= parseInt(document.getElementById('add_cid').value);
   if(!n || !u) { alert("名称和地址不能为空"); return; }
-  let arr = lines;
-  arr.push({name:n, url:u, icon:ic, cid, hidden:false});
-  lines = arr;
+  lines.push({name:n, url:u, icon:ic, cid, hidden:false});
+  localStorage.setItem('lines', JSON.stringify(lines));
   document.getElementById('add_name').value = '';
   document.getElementById('add_url').value = '';
   document.getElementById('add_icon').value = '';
-  renderAdminLine();
-  renderHome();
-  alert("✅ 添加导航成功（已云同步）");
+  renderAdminLine(); renderHome(); alert("✅ 添加导航成功");
 }
 function openEdit(i) {
   if(i<0||i>=lines.length) return;
@@ -812,43 +799,39 @@ function saveEdit() {
   let ic= document.getElementById('edit_icon').value.trim() || '🔗';
   let cid= parseInt(document.getElementById('edit_cid').value);
   if(!n || !u) { alert("不能为空"); return; }
-  let arr = lines;
-  arr[editIndex] = {...arr[editIndex], name:n, url:u, icon:ic, cid};
-  lines = arr;
-  renderAdminLine();
-  renderHome();
-  closeEdit();
-  alert("✅ 修改成功（已云同步）");
+  lines[editIndex] = {...lines[editIndex], name:n, url:u, icon:ic, cid};
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome(); closeEdit(); alert("✅ 修改成功");
 }
 function delLine(i) {
   if(!confirm("确定删除该导航？")) return;
-  let arr = lines;
-  arr.splice(i,1);
-  lines = arr;
-  renderAdminLine();
-  renderHome();
-  alert("🗑️ 删除成功");
+  lines.splice(i,1);
+  localStorage.setItem('lines', JSON.stringify(lines));
+  renderAdminLine(); renderHome(); alert("🗑️ 删除成功");
 }
 
 function closeNotice() { show('login'); }
 function saveCopyright() {
   let txt = document.getElementById('copyright_text').value.trim();
   if(!txt) { alert("请输入版权信息"); return; }
+  localStorage.setItem('copyright_text', txt);
   copyright_text = txt;
-  loadAllCopyright();
-  alert("✅ 版权已云同步");
+  loadAllCopyright(); alert("✅ 版权已保存");
 }
 function saveNotice() {
   let en = document.getElementById('notice_enabled').checked;
   let t = document.getElementById('notice_title').value.trim();
   let c = document.getElementById('notice_text').value.trim();
   if(!t || !c) { alert("标题和内容不能为空"); return; }
-  notice_enabled = en;
-  notice_title = t;
-  notice_text = c;
-  alert("✅ 公告已云同步");
+  localStorage.setItem('notice_enabled', en);
+  localStorage.setItem('notice_title', t);
+  localStorage.setItem('notice_text', c);
+  notice_enabled = en; notice_title = t; notice_text = c;
+  alert("✅ 公告已保存");
 }
 function saveSet() {
+  localStorage.setItem('mt_title', document.getElementById('set_title').value);
+  localStorage.setItem('mt_desc',  document.getElementById('set_desc').value);
   mt_title = document.getElementById('set_title').value;
   mt_desc  = document.getElementById('set_desc').value;
   document.getElementById('mt_title').innerText = encodeHTML(mt_title);
@@ -857,33 +840,43 @@ function saveSet() {
 }
 
 function openMt() {
+  localStorage.setItem('maintain','1');
   maintainMode = true;
   show('maintain');
-  alert("🔒 已开启维护模式");
-}
-function closeMt() {
-  maintainMode = false;
-  show('home');
-  alert("🔓 已关闭维护");
+  alert("🔒 已开启维护模式（仅管理员可访问）");
 }
 
-function loadRememberedPwd() {}
+function closeMt() {
+  localStorage.setItem('maintain','0');
+  maintainMode = false;
+  show('home');
+  alert("🔓 已关闭维护，所有人可正常访问");
+}
+
+function loadRememberedPwd() {
+  if(localStorage.getItem(REMEMBER_KEY)==="true") {
+    document.getElementById('pwd').value = DEFAULT_PWD;
+    document.getElementById('rememberPwd').checked = true;
+  }
+}
 function showLogin() {
   document.getElementById('pwd').value = '';
   document.getElementById('rememberPwd').checked = false;
+  loadRememberedPwd();
   show('login');
 }
 
-document.getElementById('userLoginBtn').onclick = async ()=>{
+document.getElementById('userLoginBtn').onclick = ()=>{
   let inputPwd = document.getElementById('pwd').value.trim();
   let ok = md5(inputPwd) === getAdminPwdHash();
   addAdminLog(ok);
   if(!ok) { alert("密码错误"); return; }
   setAdminLoggedIn();
+  localStorage.setItem(REMEMBER_KEY, document.getElementById('rememberPwd').checked ? "true" : "false");
   show('home');
 };
 
-document.getElementById('adminLoginBtn').onclick = async ()=>{
+document.getElementById('adminLoginBtn').onclick = ()=>{
   let inputPwd = document.getElementById('pwd').value.trim();
   let ok = md5(inputPwd) === getAdminPwdHash();
   addAdminLog(ok);
@@ -892,9 +885,7 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
   show('admin');
 };
 
-async function init() {
-  await loadCloudConfig();
-
+function init() {
   document.getElementById('mt_title').innerText = encodeHTML(mt_title);
   document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
   document.getElementById('notice_enabled').checked = notice_enabled;
@@ -904,11 +895,8 @@ async function init() {
   document.getElementById('cardStyleSelect').value = cardStyle;
   document.getElementById('cardIconCenter').checked = cardIconCenter;
 
-  renderCategoryAdmin();
-  refreshCatSelect();
-  renderHome();
-  renderAdminLine();
-  loadAllCopyright();
+  renderCategoryAdmin(); refreshCatSelect(); renderHome(); renderAdminLine();
+  loadRememberedPwd(); loadAllCopyright();
 
   setTimeout(()=>{
     if (maintainMode) {
@@ -919,7 +907,7 @@ async function init() {
     if (!maintainMode && notice_enabled) {
       document.getElementById('notice_content').innerText = notice_text;
     }
-  }, 700);
+  },900);
 }
 init();
 </script>

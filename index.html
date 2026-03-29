@@ -229,7 +229,7 @@ html, body {
 <div id="notice">
   <div class="notice-box">
     <div class="notice-title">📢 系统公告</div>
-    <div class="notice_content" id="notice_content"></div>
+    <div class="notice-content" id="notice_content"></div>
     <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
     <div class="notice-footer" id="notice_copyright"></div>
   </div>
@@ -479,6 +479,9 @@ let lines = [];
 let editIndex = -1;
 const REMEMBER_KEY = "remember_user_pwd";
 
+// ==============================================
+// 后端存储核心方法
+// ==============================================
 let allData = {};
 
 async function loadFromServer() {
@@ -522,6 +525,9 @@ async function saveToServer() {
   }
 }
 
+// ==============================================
+// 备份还原
+// ==============================================
 function exportBackup() {
   const data = {...allData, categories, lines, admin_pwd_hash};
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'text/plain'});
@@ -570,6 +576,9 @@ async function importBackup() {
   reader.readAsText(input.files[0]);
 }
 
+// ==============================================
+// 分类/导航/日志等
+// ==============================================
 function toggleCategoryVisible(index) {
   categories[index].hidden = !categories[index].hidden;
   saveToServer();
@@ -694,6 +703,9 @@ async function resetPassword() {
   alert("🔄 已重置为：668899");
 }
 
+// ==============================================
+// 分类
+// ==============================================
 function renderCategoryAdmin() {
   let dom = document.getElementById('categoryList'); dom.innerHTML = '';
   categories.forEach((c,i)=>{
@@ -743,6 +755,9 @@ function refreshCatSelect() {
   });
 }
 
+// ==============================================
+// 首页渲染
+// ==============================================
 function renderHome() {
   let dom = document.getElementById('lineList'); dom.innerHTML = '';
   categories.filter(c => !c.hidden).forEach(cat=>{
@@ -881,39 +896,27 @@ function showLogin() {
   show('login');
 }
 
-// 修复：登录按钮绑定 & 密码验证
-document.getElementById('userLoginBtn').addEventListener('click', async () => {
-  const inputPwd = document.getElementById('pwd').value.trim();
-  if (!admin_pwd_hash) {
-    alert('未加载到密码配置，请刷新页面重试');
-    return;
-  }
-  const ok = md5(inputPwd) === admin_pwd_hash;
+document.getElementById('userLoginBtn').onclick = ()=>{
+  let inputPwd = document.getElementById('pwd').value.trim();
+  let ok = md5(inputPwd) === admin_pwd_hash;
   addAdminLog(ok);
-  if (!ok) {
-    alert('密码错误');
-    return;
-  }
+  if(!ok) { alert("密码错误"); return; }
   setAdminLoggedIn();
   show('home');
-});
+};
 
-document.getElementById('adminLoginBtn').addEventListener('click', async () => {
-  const inputPwd = document.getElementById('pwd').value.trim();
-  if (!admin_pwd_hash) {
-    alert('未加载到密码配置，请刷新页面重试');
-    return;
-  }
-  const ok = md5(inputPwd) === admin_pwd_hash;
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  let inputPwd = document.getElementById('pwd').value.trim();
+  let ok = md5(inputPwd) === admin_pwd_hash;
   addAdminLog(ok);
-  if (!ok) {
-    alert('密码错误');
-    return;
-  }
+  if(!ok) { alert("密码错误"); return; }
   setAdminLoggedIn();
   show('admin');
-});
+};
 
+// ==============================================
+// 初始化
+// ==============================================
 async function init() {
   await loadFromServer();
 

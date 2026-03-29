@@ -23,12 +23,6 @@
       "name": "福利",
       "icon": "📁",
       "hidden": false
-    },
-    {
-      "id": 5,
-      "name": "测试",
-      "icon": "📁",
-      "hidden": false
     }
   ],
   "lines": [
@@ -64,7 +58,21 @@
       "name": "百度",
       "url": "http://www.baidu.com",
       "icon": "🔗",
-      "cid": 5,
+      "cid": 1,
+      "hidden": false
+    },
+    {
+      "name": "订阅平台",
+      "url": "https://1114440.ru1999.cloudns.org/yu19941217",
+      "icon": "🔗",
+      "cid": 3,
+      "hidden": false
+    },
+    {
+      "name": "汇聚平台",
+      "url": "https://rrr.xiaohe1999.dpdns.org/ccy",
+      "icon": "🔗",
+      "cid": 3,
       "hidden": false
     }
   ],

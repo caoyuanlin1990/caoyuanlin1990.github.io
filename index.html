@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>闲时导航 - 自动恢复备份</title>
+<title>闲时导航 - 自动加载配置</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
 * {
@@ -171,7 +171,7 @@ html,body {
 <div id="splash">
   <div class="splash-icon">🧭</div>
   <div class="splash-title">闲时导航</div>
-  <div class="splash-desc">本地备份 · 自动恢复</div>
+  <div class="splash-desc">正在加载配置...</div>
   <div class="splash-footer" id="splash_copyright"></div>
 </div>
 
@@ -244,7 +244,7 @@ html,body {
       <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">💾 导出本地备份</button>
       <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
       <button class="btn btn-danger" onclick="importBackup()" style="width:100%;margin-bottom:8px;">⚠️ 从本地文件还原</button>
-      <button class="btn btn-info" onclick="restoreFromGithubUrl()" style="width:100%;">🌐 从GitHub地址自动恢复备份</button>
+      <button class="btn btn-info" onclick="restoreFromGithubUrl()" style="width:100%;">🌐 手动从GitHub同步配置</button>
     </div>
   </div>
 
@@ -337,7 +337,7 @@ html,body {
       <div id="adminLineList"></div>
       <input class="form-input" id="add_name" placeholder="导航名称">
       <input class="form-input" id="add_url" placeholder="跳转地址">
-      <input class="form-input" id="add_icon" placeholder="导航图标">
+      <input class="form-input" id="add_icon" placeholder="自定义图标">
       <select class="form-select" id="add_cid"></select>
       <button class="btn btn-success" onclick="addLine()" style="width:100%">➕ 添加导航</button>
     </div>
@@ -358,8 +358,8 @@ html,body {
 </div>
 
 <script>
-// 自动恢复备份的GitHub地址
-const BACKUP_GITHUB_URL = "https://raw.githubusercontent.com/caoyuanlin1990/caoyuanlin1990.github.io/refs/heads/main/nav-backup-1774766170141.txt";
+// 自动加载配置的GitHub地址
+const CONFIG_GITHUB_URL = "https://raw.githubusercontent.com/caoyuanlin1990/caoyuanlin1990.github.io/refs/heads/main/nav-backup-1774766170141.txt";
 
 function encodeHTML(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -444,8 +444,41 @@ function saveAllToLocal() {
   localStorage.setItem('copyright_text', copyright_text);
 }
 
+// 核心：自动从GitHub读取配置
+async function autoLoadConfigFromGithub() {
+  try {
+    const response = await fetch(CONFIG_GITHUB_URL);
+    if(!response.ok) throw new Error('配置文件拉取失败');
+    const configData = await response.text();
+    const data = JSON.parse(configData);
+    unpackAll(data);
+    renderAll();
+  } catch (e) {
+    console.log('自动加载配置失败，使用本地缓存：', e.message);
+  } finally {
+    // 加载完成后跳转到对应页面
+    initPageShow();
+  }
+}
+
+// 手动从GitHub同步配置
+async function restoreFromGithubUrl() {
+  if(!confirm('⚠️ 手动同步将覆盖本地所有数据，确定继续？')) return;
+  try {
+    const response = await fetch(CONFIG_GITHUB_URL);
+    if(!response.ok) throw new Error('配置文件拉取失败');
+    const configData = await response.text();
+    const data = JSON.parse(configData);
+    unpackAll(data);
+    renderAll();
+    alert('✅ 手动同步GitHub配置成功！');
+  } catch (e) {
+    alert(`❌ 同步失败：${e.message}`);
+  }
+}
+
 // ==============================================
-// 备份 / 还原 + 从GitHub地址自动恢复
+// 备份 / 还原
 // ==============================================
 function exportBackup() {
   const blob = new Blob([JSON.stringify(packAll(),null,2)],{type:'text/plain'});
@@ -467,26 +500,9 @@ function importBackup() {
       unpackAll(d);
       renderAll();
       alert('✅ 从本地文件还原成功');
-      location.reload();
     }catch(e){alert('❌ 备份文件格式错误')}
   };
   r.readAsText(f);
-}
-
-async function restoreFromGithubUrl() {
-  if(!confirm('⚠️ 从GitHub地址恢复将覆盖本地所有数据，确定继续？')) return;
-  try {
-    const response = await fetch(BACKUP_GITHUB_URL);
-    if(!response.ok) throw new Error('备份文件拉取失败');
-    const backupData = await response.text();
-    const data = JSON.parse(backupData);
-    unpackAll(data);
-    renderAll();
-    alert('✅ 从GitHub地址恢复备份成功！');
-    location.reload();
-  } catch (e) {
-    alert(`❌ 恢复失败：${e.message}`);
-  }
 }
 
 // ==============================================
@@ -535,6 +551,15 @@ function showLogin() {
 }
 
 function closeNotice(){show('login');}
+
+// 加载完成后初始化页面显示
+function initPageShow() {
+  if(maintainMode && !isAdminLoggedIn()){
+    show('maintain');
+  } else {
+    showLogin();
+  }
+}
 
 // ==============================================
 // 分类 & 导航
@@ -736,7 +761,7 @@ document.getElementById('adminLoginBtn').onclick=()=>{
 };
 
 // ==============================================
-// 启动（修复：直接显示登录页）
+// 启动：先自动加载配置，再显示页面
 // ==============================================
 function init(){
   document.getElementById('mt_title').innerText=mt_title;
@@ -747,16 +772,8 @@ function init(){
   document.getElementById('copyright_text').value=copyright_text;
   document.getElementById('cardStyleSelect').value=cardStyle;
   document.getElementById('cardIconCenter').checked=cardIconCenter;
-  renderAll();
-  
-  // 直接显示登录页，跳过闪屏和公告
-  setTimeout(()=>{
-    if(maintainMode && !isAdminLoggedIn()){
-      show('maintain');
-    } else {
-      showLogin();
-    }
-  }, 100);
+  // 启动即自动加载GitHub配置
+  autoLoadConfigFromGithub();
 }
 init();
 </script>

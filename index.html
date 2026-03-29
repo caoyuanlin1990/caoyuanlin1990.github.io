@@ -389,6 +389,22 @@ let categories      = JSON.parse(localStorage.getItem('cats')) || [{id:1,name:'�
 let lines           = JSON.parse(localStorage.getItem('lines')) || [];
 let editIndex       = -1;
 
+// 记住密码相关
+function saveRememberPwd(pwd) {
+  if (document.getElementById('rememberPwd').checked) {
+    localStorage.setItem('remember_pwd', pwd);
+  } else {
+    localStorage.removeItem('remember_pwd');
+  }
+}
+function loadRememberPwd() {
+  const pwd = localStorage.getItem('remember_pwd');
+  if (pwd) {
+    document.getElementById('pwd').value = pwd;
+    document.getElementById('rememberPwd').checked = true;
+  }
+}
+
 function packAll() {
   return {
     categories, lines, cardStyle, cardIconCenter,
@@ -514,6 +530,7 @@ function show(id) {
 function showLogin() {
   document.getElementById('pwd').value='';
   document.getElementById('rememberPwd').checked=false;
+  loadRememberPwd();
   show('login');
 }
 
@@ -699,25 +716,27 @@ function updatePassword(){
   document.getElementById('new_pwd').value='';
   document.getElementById('confirm_pwd').value='';
   alert('✅ 密码修改成功，请重新登录');
-  clearAdminLoggedIn();
+  localStorage.removeItem('remember_pwd');
   showLogin();
 }
-function resetPassword(){if(!confirm('确定将密码重置为默认密码668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 密码已重置为默认密码：668899，请重新登录');clearAdminLoggedIn();showLogin();}
+function resetPassword(){if(!confirm('确定将密码重置为默认密码668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 密码已重置为默认密码：668899，请重新登录');localStorage.removeItem('remember_pwd');showLogin();}
 
 // ==============================================
 // 登录
 // ==============================================
 document.getElementById('userLoginBtn').onclick=()=>{
   let v=document.getElementById('pwd').value.trim();
+  saveRememberPwd(v);
   if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('❌ 登录密码错误');
 };
 document.getElementById('adminLoginBtn').onclick=()=>{
   let v=document.getElementById('pwd').value.trim();
+  saveRememberPwd(v);
   if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('❌ 登录密码错误');
 };
 
 // ==============================================
-// 启动
+// 启动（修复：直接显示登录页）
 // ==============================================
 function init(){
   document.getElementById('mt_title').innerText=mt_title;
@@ -729,12 +748,15 @@ function init(){
   document.getElementById('cardStyleSelect').value=cardStyle;
   document.getElementById('cardIconCenter').checked=cardIconCenter;
   renderAll();
+  
+  // 直接显示登录页，跳过闪屏和公告
   setTimeout(()=>{
-    if(maintainMode){show('maintain');}else{
-      show(notice_enabled?'notice':'home');
-      if(notice_enabled)document.getElementById('notice_content').innerText=notice_text;
+    if(maintainMode && !isAdminLoggedIn()){
+      show('maintain');
+    } else {
+      showLogin();
     }
-  },800);
+  }, 100);
 }
 init();
 </script>

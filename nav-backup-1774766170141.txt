@@ -1,0 +1,61 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "默认",
+      "icon": "📁",
+      "hidden": false
+    },
+    {
+      "id": 2,
+      "name": "电视剧",
+      "icon": "📁",
+      "hidden": false
+    },
+    {
+      "id": 3,
+      "name": "工具",
+      "icon": "📁",
+      "hidden": false
+    },
+    {
+      "id": 4,
+      "name": "福利",
+      "icon": "📁",
+      "hidden": false
+    }
+  ],
+  "lines": [
+    {
+      "name": "我的网盘",
+      "url": "https://ru.xiaohe1999.dpdns.org",
+      "icon": "🔗",
+      "cid": 3,
+      "hidden": false
+    },
+    {
+      "name": "推荐",
+      "url": "https://tv.xiaoshus.ggff.net",
+      "icon": "🔗",
+      "cid": 2,
+      "hidden": false
+    },
+    {
+      "name": "备用",
+      "url": "https://tv2.xiaoshus.ggff.net",
+      "icon": "🔗",
+      "cid": 2,
+      "hidden": false
+    }
+  ],
+  "cardStyle": "default",
+  "cardIconCenter": false,
+  "maintainMode": false,
+  "mt_title": "维护中",
+  "mt_desc": "升级维护",
+  "notice_enabled": false,
+  "notice_title": "公告",
+  "notice_text": "欢迎使用",
+  "copyright_text": "© 2026 闲时导航",
+  "pwd_hash": "c3d469023086a1778d872be41ac64239"
+}

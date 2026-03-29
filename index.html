@@ -177,7 +177,7 @@ html,body {
 <div id="notice">
   <div class="notice-box">
     <div class="notice-title">📢 系统公告</div>
-    <div class="notice-content" id="notice_content"></div>
+    <div class="notice_content" id="notice_content"></div>
     <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
     <div class="notice-footer" id="notice_copyright"></div>
   </div>
@@ -368,9 +368,6 @@ html,body {
 </div>
 
 <script>
-// ==============================================
-// 已自动填入你的 Gist ID & GitHub Token
-// ==============================================
 const GIST_ID        = "29fbb5f067281c0e42cab753608122a1";
 const GITHUB_TOKEN   = "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";
 
@@ -402,9 +399,6 @@ let categories      = JSON.parse(localStorage.getItem('cats')) || [{id:1,name:'�
 let lines           = JSON.parse(localStorage.getItem('lines')) || [];
 let editIndex       = -1;
 
-// ==============================================
-// Gist 同步核心
-// ==============================================
 async function getGistData() {
   let r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
     headers:{Authorization:`token ${GITHUB_TOKEN}`}
@@ -464,23 +458,26 @@ function saveAllToLocal() {
   localStorage.setItem('copyright_text', copyright_text);
 }
 
+// -------------- 只有这里被替换成你指定的拉取地址 --------------
+async function pullFromGist() {
+  if(!confirm('将覆盖本地数据，确定拉取？')) return;
+  try {
+    let res = await fetch('https://ru.xiaohe1999.dpdns.org/raw/nav-backup-1774766170141.txt');
+    let data = await res.json();
+    unpackAll(data);
+    renderAll();
+    alert('✅ 拉取完成');
+  } catch(e) {
+    alert('拉取失败');
+  }
+}
+
 async function pushToGist() {
   if(!confirm('确定上传到云端？')) return;
   await setGistData(packAll());
   alert('✅ 已上传到Gist云端');
 }
 
-async function pullFromGist() {
-  if(!confirm('将覆盖本地数据，确定拉取？')) return;
-  let data = await getGistData();
-  unpackAll(data);
-  renderAll();
-  alert('✅ 已从Gist拉取最新数据');
-}
-
-// ==============================================
-// 备份 / 还原
-// ==============================================
 function exportBackup() {
   const blob = new Blob([JSON.stringify(packAll(),null,2)],{type:'text/plain'});
   const a = document.createElement('a');
@@ -507,9 +504,6 @@ function importBackup() {
   r.readAsText(f);
 }
 
-// ==============================================
-// 渲染
-// ==============================================
 function renderAll() {
   renderCategoryAdmin(); renderHome(); renderAdminLine(); refreshCatSelect(); loadCopyright();
 }
@@ -553,9 +547,6 @@ function showLogin() {
 
 function closeNotice(){show('login');}
 
-// ==============================================
-// 分类 & 导航
-// ==============================================
 function refreshCatSelect() {
   let a = document.getElementById('add_cid');
   let e = document.getElementById('edit_cid');
@@ -605,9 +596,6 @@ function addCategory(){
   renderAll(); alert('✅ 添加成功');
 }
 
-// ==============================================
-// 首页导航
-// ==============================================
 function renderHome() {
   let dom = document.getElementById('lineList'); dom.innerHTML='';
   categories.filter(c=>!c.hidden).forEach(cat=>{
@@ -681,9 +669,6 @@ function saveEdit(){
   saveAllToLocal(); renderAll(); closeEdit(); alert('✅ 已保存');
 }
 
-// ==============================================
-// 设置
-// ==============================================
 function saveCardStyle(){
   cardStyle=document.getElementById('cardStyleSelect').value;
   cardIconCenter=document.getElementById('cardIconCenter').checked;
@@ -732,9 +717,6 @@ function updatePassword(){
 }
 function resetPassword(){if(!confirm('重置为668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 已重置');}
 
-// ==============================================
-// 登录
-// ==============================================
 document.getElementById('userLoginBtn').onclick=()=>{
   let v=document.getElementById('pwd').value.trim();
   if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('密码错误');
@@ -744,9 +726,6 @@ document.getElementById('adminLoginBtn').onclick=()=>{
   if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('密码错误');
 };
 
-// ==============================================
-// 启动
-// ==============================================
 function init(){
   document.getElementById('mt_title').innerText=mt_title;
   document.getElementById('mt_desc').innerText=mt_desc;

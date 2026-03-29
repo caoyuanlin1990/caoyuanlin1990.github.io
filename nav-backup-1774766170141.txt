@@ -48,17 +48,17 @@
       "hidden": false
     },
     {
-      "name": "xvideos",
+      "name": "xvideos(国内无法打开)",
       "url": "https://www.xvideos.com",
       "icon": "🔗",
       "cid": 4,
       "hidden": false
     },
     {
-      "name": "百度",
-      "url": "http://www.baidu.com",
+      "name": "91porn",
+      "url": "https://46a0.ogzxnem.cc/",
       "icon": "🔗",
-      "cid": 1,
+      "cid": 4,
       "hidden": false
     },
     {

@@ -3,115 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>闲时导航 - 专业稳定导航系统</title>
+<title>闲时导航 - Gist云端同步</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
 }
-html, body {
-  width: 100%;
-  min-height: 100vh;
-  background: #F7F8FA;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
+html,body {
+  width:100%;
+  min-height:100vh;
+  background:#F7F8FA;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
 }
-
 :root {
-  --primary: #165DFF;
-  --success: #00B42A;
-  --danger: #F53F3F;
-  --warning: #FF7D00;
-  --neutral: #86909C;
-  --light: #F2F3F5;
-  --card-bg: #FFFFFF;
-  --border: #E5E6EB;
-  --radius: 16px;
-  --card-radius: 12px;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  --text-main: #1D2129;
-  --text-normal: #4E5969;
+  --primary:#165DFF; --success:#00B42A; --danger:#F53F3F;
+  --warning:#FF7D00; --neutral:#86909C; --light:#F2F3F5;
+  --card-bg:#fff; --border:#E5E6EB; --radius:16px;
+  --shadow:0 2px 12px rgba(0,0,0,0.06);
+  --text-main:#1D2129; --text-normal:#4E5969;
 }
-
 .nav-card {
-  background: var(--card-bg);
-  padding: 16px 14px;
-  margin-bottom: 8px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background:var(--card-bg); padding:16px 14px; margin-bottom:8px;
+  border:1px solid var(--border); display:flex; align-items:center; gap:12px;
+  cursor:pointer; transition:all 0.2s;
 }
-.nav-card:hover {
-  border-color: var(--primary);
-  background: #F7F8FF;
-}
-.nav-card.round { border-radius: 16px; }
-.nav-card.square { border-radius: 0; }
-.nav-card.flat { border-radius: 8px; border: none; background: #f2f3f7; }
-.nav-card.center .nav-icon { margin: 0 auto; }
+.nav-card:hover { border-color:var(--primary); background:#F7F8FF; }
+.nav-card.round { border-radius:16px; }
+.nav-card.square { border-radius:0; }
+.nav-card.flat { border-radius:8px; border:none; background:#f2f3f7; }
+.nav-card.center .nav-icon { margin:0 auto; }
 .nav-icon {
-  width: 34px;
-  height: 34px;
-  background: var(--primary);
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
+  width:34px; height:34px; background:var(--primary); color:#fff;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
 }
-.nav-text {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-main);
-}
+.nav-text { flex:1; font-size:15px; font-weight:500; color:var(--text-main); }
 
 #splash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  color: var(--primary);
-  gap: 16px;
-  animation: splashFade 0.4s ease forwards;
+  position:fixed; top:0; left:0; width:100%; height:100vh;
+  background:#fff; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; z-index:99999; color:var(--primary); gap:16px;
 }
-.splash-icon { font-size: 52px; }
-.splash-title { font-size: 26px; font-weight: 600; color: var(--text-main); }
-.splash-desc { font-size: 14px; color: var(--neutral); }
-.splash-footer { position: absolute; bottom: 36px; font-size: 12px; color: var(--neutral); }
-@keyframes splashFade { from { opacity: 0; } to { opacity: 1; } }
+.splash-icon { font-size:52px; }
+.splash-title { font-size:26px; font-weight:600; color:var(--text-main); }
+.splash-desc { font-size:14px; color:var(--neutral); }
+.splash-footer { position:absolute; bottom:36px; font-size:12px; color:var(--neutral); }
 
 #notice {
-  position: fixed; top:0; left:0; width:100%; height:100vh;
-  background: #F7F8FA; display:none; flex-direction:column; align-items:center; justify-content:center;
-  z-index:9999; padding:30px;
+  position:fixed; top:0; left:0; width:100%; height:100vh;
+  background:#F7F8FA; display:none; flex-direction:column; align-items:center;
+  justify-content:center; z-index:9999; padding:30px;
 }
 .notice-box {
-  background: var(--card-bg); border-radius: var(--radius); padding:30px 24px;
+  background:var(--card-bg); border-radius:var(--radius); padding:30px 24px;
   width:100%; max-width:380px; box-shadow:var(--shadow); border:1px solid var(--border);
 }
 .notice-title { font-size:18px; font-weight:600; text-align:center; margin-bottom:18px; color:var(--text-main); }
 .notice-content { font-size:15px; line-height:1.7; color:var(--text-normal); white-space:pre-line; margin-bottom:24px; min-height:100px; }
-.notice-btn { width:100%; padding:13px; border-radius:10px; background:var(--primary); color:#fff; font-size:15px; font-weight:500; border:none; cursor:pointer; transition:background 0.2s; }
-.notice-btn:hover { background:#0E42D2; }
-.notice-footer { text-align:center; margin-top:18px; font-size:12px; color:var(--neutral); }
+.notice-btn { width:100%; padding:13px; border-radius:10px; background:var(--primary); color:#fff; font-size:15px; font-weight:500; border:none; cursor:pointer; }
 
 #editModal {
   position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.25);
@@ -122,7 +77,7 @@ html, body {
   width:100%; max-width:360px; box-shadow:0 8px 25px rgba(0,0,0,0.1); border:1px solid var(--border);
 }
 .modal-title { font-size:17px; font-weight:600; margin-bottom:16px; text-align:center; color:var(--text-main); }
-.modal-input, .modal-select { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; font-size:15px; color:var(--text-main); background:#fff; }
+.modal-input,.modal-select { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; font-size:15px; }
 .modal-btns { display:flex; gap:10px; margin-top:10px; }
 .modal-btns button { flex:1; padding:11px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
 .btn-cancel { background:var(--light); color:var(--text-normal); }
@@ -134,17 +89,15 @@ html, body {
 }
 .maintain-box {
   background:var(--card-bg); border-radius:var(--radius); padding:40px 30px;
-  width:100%; max-width:400px; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow); position:relative;
+  width:100%; max-width:400px; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow);
 }
 .maintain-icon { font-size:48px; margin-bottom:20px; color:var(--neutral); }
 .maintain-title { font-size:20px; font-weight:600; margin-bottom:10px; color:var(--text-main); }
 .maintain-desc { font-size:15px; color:var(--text-normal); line-height:1.5; margin-bottom:20px; }
-.maintain-footer { font-size:12px; color:var(--neutral); margin-top:24px; }
 #adminLoginBtnInMaintain {
   width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
-  background:var(--card-bg); font-size:18px; cursor:pointer; transition:all 0.2s; color:var(--primary); margin-top:12px;
+  background:var(--card-bg); font-size:18px; cursor:pointer; color:var(--primary); margin-top:12px;
 }
-#adminLoginBtnInMaintain:hover { background:var(--primary); color:#fff; }
 
 #login {
   width:100%; max-width:360px; background:var(--card-bg); border-radius:var(--radius);
@@ -153,11 +106,10 @@ html, body {
 .login-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
 .admin-icon-btn { position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:18px; color:var(--primary); cursor:pointer; }
 .login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:28px; color:var(--text-main); }
-.login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; background:#fff; }
+.login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; }
 .remember-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; font-size:14px; color:var(--text-normal); }
 .btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
 .btn-primary { background:var(--primary); color:#fff; }
-.btn-primary:hover { background:#0E42D2; }
 
 #home {
   width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
@@ -182,7 +134,7 @@ html, body {
 .collapse-body { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
 .collapse-body.show { max-height:1000px; }
 .section { margin-bottom:16px; }
-.form-input, .form-text, .form-select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:10px; background:#fff; }
+.form-input,.form-text,.form-select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:10px; background:#fff; }
 .form-text { min-height:70px; resize:vertical; }
 .btn-group { display:flex; gap:8px; margin-top:6px; }
 .btn-group .btn { flex:1; }
@@ -205,24 +157,20 @@ html, body {
 .btn-toggle { background:var(--primary); }
 
 .log-item {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text-normal);
+  padding:8px 10px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-normal);
 }
-.log-time { color: var(--primary); }
-.log-ip { color: var(--success); }
-.log-fail { color: var(--danger); }
-.log-success { color: var(--success); }
+.log-time { color:var(--primary); }
+.log-ip { color:var(--success); }
+.log-fail { color:var(--danger); }
+.log-success { color:var(--success); }
 </style>
 </head>
-
 <body>
 
 <div id="splash">
   <div class="splash-icon">🧭</div>
   <div class="splash-title">闲时导航</div>
-  <div class="splash-desc">专业稳定 · 安全快捷 · 持续可用</div>
+  <div class="splash-desc">Gist云端同步 · 多设备实时互通</div>
   <div class="splash-footer" id="splash_copyright"></div>
 </div>
 
@@ -240,7 +188,7 @@ html, body {
     <div class="modal-title">编辑导航</div>
     <input class="modal-input" id="edit_name" placeholder="导航名称">
     <input class="modal-input" id="edit_url" placeholder="跳转地址">
-    <input class="modal-input" id="edit_icon" placeholder="自定义图标（如：🚀🔥📘）">
+    <input class="modal-input" id="edit_icon" placeholder="自定义图标">
     <select class="modal-select" id="edit_cid"></select>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeEdit()">取消</button>
@@ -253,7 +201,7 @@ html, body {
   <div class="maintain-box">
     <div class="maintain-icon">🔧</div>
     <div class="maintain-title" id="mt_title">系统维护中</div>
-    <div class="maintain-desc" id="mt_desc">为提供更稳定的服务，系统正在升级维护。</div>
+    <div class="maintain-desc" id="mt_desc">升级维护中</div>
     <button id="adminLoginBtnInMaintain" onclick="show('login')">⚙️</button>
     <div class="maintain-footer" id="maintain_copyright"></div>
   </div>
@@ -287,33 +235,26 @@ html, body {
   </div>
 
   <div class="section">
-    <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
-      <span>💾 数据备份与还原</span>
-      <span class="collapse-arrow" id="arr_backupCollapse">▶</span>
+    <div class="collapse-header" onclick="toggleCollapse('gistSyncCollapse')">
+      <span>☁️ Gist云端同步</span>
+      <span class="collapse-arrow" id="arr_gistSyncCollapse">▶</span>
     </div>
-    <div class="collapse-body" id="backupCollapse">
-      <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">
-        备份包含：分类、导航、公告、版权、样式全部设置
-      </div>
-      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">
-        💾 导出全部数据备份
-      </button>
-      <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
-      <button class="btn btn-danger" onclick="importBackup()" style="width:100%;">
-        ⚠️ 从备份文件还原数据
-      </button>
+    <div class="collapse-body" id="gistSyncCollapse">
+      <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">从云端拉取最新数据会覆盖本地</div>
+      <button class="btn btn-success" onclick="pullFromGist()" style="width:100%;margin-bottom:8px;">⬇️ 从云端拉取数据</button>
+      <button class="btn btn-primary" onclick="pushToGist()" style="width:100%">⬆️ 上传数据到云端</button>
     </div>
   </div>
 
   <div class="section">
-    <div class="collapse-header" onclick="toggleCollapse('batchIconCollapse')">
-      <span>🪄 分类图标批量更换</span>
-      <span class="collapse-arrow" id="arr_batchIconCollapse">▶</span>
+    <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
+      <span>💾 本地备份/还原</span>
+      <span class="collapse-arrow" id="arr_backupCollapse">▶</span>
     </div>
-    <div class="collapse-body" id="batchIconCollapse">
-      <input class="form-input" id="batchCategoryIcon" placeholder="请输入要统一使用的图标，例如 📁">
-      <button class="btn btn-success" onclick="batchUpdateCategoryIcon()" style="width:100%">✅ 一键批量更换</button>
-      <div style="font-size:12px; color:#86909C; margin-top:6px;">提示：将替换所有分类的图标为你输入的内容</div>
+    <div class="collapse-body" id="backupCollapse">
+      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">💾 导出备份</button>
+      <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
+      <button class="btn btn-danger" onclick="importBackup()" style="width:100%">⚠️ 从备份还原</button>
     </div>
   </div>
 
@@ -334,17 +275,6 @@ html, body {
         <label for="cardIconCenter">图标居中</label>
       </div>
       <button class="btn btn-success" onclick="saveCardStyle()" style="width:100%">💾 应用样式</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="collapse-header" onclick="toggleCollapse('logCollapse')">
-      <span>📝 后台登录日志</span>
-      <span class="collapse-arrow" id="arr_logCollapse">▶</span>
-    </div>
-    <div class="collapse-body" id="logCollapse">
-      <div id="logList" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; margin-bottom:10px;"></div>
-      <button class="btn btn-danger" onclick="clearAdminLog()" style="width:100%">🗑️ 清空日志</button>
     </div>
   </div>
 
@@ -372,9 +302,6 @@ html, body {
     <div class="collapse-body" id="maintainCollapse">
       <input class="form-input" id="set_title" placeholder="维护标题">
       <textarea class="form-text" id="set_desc" placeholder="维护说明"></textarea>
-      <div style="font-size:12px; color:#86909C; margin:6px 0;">
-        🔒 已开启：维护时<strong>仅管理员可访问</strong>，游客仅看维护页
-      </div>
       <div class="btn-group">
         <button class="btn btn-success" onclick="saveSet()">💾 保存</button>
         <button class="btn btn-primary" onclick="openMt()">🔓 开启维护</button>
@@ -400,27 +327,27 @@ html, body {
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('categoryCollapse')">
-      <span>📂 分类管理（可隐藏）</span>
+      <span>📂 分类管理</span>
       <span class="collapse-arrow" id="arr_categoryCollapse">▶</span>
     </div>
     <div class="collapse-body" id="categoryCollapse">
       <div id="categoryList"></div>
       <input class="form-input" id="add_category_name" placeholder="分类名称">
-      <input class="form-input" id="add_category_icon" placeholder="分类图标（如：📁💻🎬）">
+      <input class="form-input" id="add_category_icon" placeholder="分类图标">
       <button class="btn btn-success" onclick="addCategory()" style="width:100%">➕ 添加分类</button>
     </div>
   </div>
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('lineCollapse')">
-      <span>🧭 导航管理（可排序/可隐藏）</span>
+      <span>🧭 导航管理</span>
       <span class="collapse-arrow" id="arr_lineCollapse">▶</span>
     </div>
     <div class="collapse-body" id="lineCollapse">
       <div id="adminLineList"></div>
       <input class="form-input" id="add_name" placeholder="导航名称">
       <input class="form-input" id="add_url" placeholder="跳转地址">
-      <input class="form-input" id="add_icon" placeholder="导航图标（如：🚀🔥📘）">
+      <input class="form-input" id="add_icon" placeholder="导航图标">
       <select class="form-select" id="add_cid"></select>
       <button class="btn btn-success" onclick="addLine()" style="width:100%">➕ 添加导航</button>
     </div>
@@ -432,7 +359,7 @@ html, body {
       <span class="collapse-arrow" id="arr_copyrightCollapse">▶</span>
     </div>
     <div class="collapse-body" id="copyrightCollapse">
-      <input class="form-input" id="copyright_text" placeholder="© 2026 闲时导航 版权所有">
+      <input class="form-input" id="copyright_text" placeholder="© 2026 闲时导航">
       <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">💾 保存版权</button>
     </div>
   </div>
@@ -441,362 +368,277 @@ html, body {
 </div>
 
 <script>
+// ==============================================
+// 已自动填入你的 Gist ID & GitHub Token
+// ==============================================
+const GIST_ID        = "29fbb5f067281c0e42cab753608122a1";
+const GITHUB_TOKEN   = "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";
+
 function encodeHTML(s) {
-  return s.replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 function safeUrl(url) {
-  try { let u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:' ? url : '#'; } catch { return '#'; }
+  try { let u = new URL(url); return u.protocol.startsWith('http') ? url : '#'; } catch { return '#'; }
 }
-function getIP() { return '服务器'; }
-function nowStr() { let d = new Date(); return d.toLocaleString(); }
+function nowStr() { return new Date().toLocaleString(); }
 
-function setAdminLoggedIn() { localStorage.setItem('admin_logged', '1'); }
-function isAdminLoggedIn() { return localStorage.getItem('admin_logged') === '1'; }
-function clearAdminLoggedIn() { localStorage.removeItem('admin_logged'); }
+function setAdminLoggedIn() { localStorage.setItem('admin_logged','1'); }
+function isAdminLoggedIn() { return localStorage.getItem('admin_logged')==='1'; }
 
 const DEFAULT_PWD = "668899";
-let admin_pwd_hash = "";
+function getPwdHash() { return localStorage.getItem('pwd_hash') || md5(DEFAULT_PWD); }
+function setPwdHash(h) { localStorage.setItem('pwd_hash',h); }
 
-let cardStyle = 'default';
-let cardIconCenter = false;
-
-let maintainMode = false;
-let mt_title = '';
-let mt_desc  = '';
-
-let notice_enabled = true;
-let notice_title   = '';
-let notice_text    = '';
-
-let copyright_text = '';
-
-let categories = [];
-let lines = [];
-let editIndex = -1;
-const REMEMBER_KEY = "remember_user_pwd";
+let cardStyle       = localStorage.getItem('cardStyle') || 'default';
+let cardIconCenter  = localStorage.getItem('cardIconCenter') === 'true';
+let maintainMode    = localStorage.getItem('maintain') === '1';
+let mt_title        = localStorage.getItem('mt_title') || '维护中';
+let mt_desc         = localStorage.getItem('mt_desc')  || '升级维护';
+let notice_enabled  = localStorage.getItem('notice_enabled') !== 'false';
+let notice_title    = localStorage.getItem('notice_title') || '公告';
+let notice_text     = localStorage.getItem('notice_text') || '欢迎使用';
+let copyright_text  = localStorage.getItem('copyright_text') || '© 2026 闲时导航';
+let categories      = JSON.parse(localStorage.getItem('cats')) || [{id:1,name:'默认',icon:'📁',hidden:false}];
+let lines           = JSON.parse(localStorage.getItem('lines')) || [];
+let editIndex       = -1;
 
 // ==============================================
-// 后端存储核心方法
+// Gist 同步核心
 // ==============================================
-let allData = {};
-
-async function loadFromServer() {
-  try {
-    let res = await fetch('api.php?action=get');
-    allData = await res.json();
-
-    categories      = allData.categories;
-    lines           = allData.lines;
-    notice_enabled  = allData.notice_enabled;
-    notice_title    = allData.notice_title;
-    notice_text     = allData.notice_text;
-    copyright_text  = allData.copyright_text;
-    cardStyle       = allData.cardStyle;
-    cardIconCenter  = allData.cardIconCenter;
-    maintainMode    = allData.maintainMode;
-    mt_title        = allData.mt_title;
-    mt_desc         = allData.mt_desc;
-    admin_pwd_hash  = allData.admin_pwd_hash;
-  } catch(e) {
-    alert('加载数据失败：' + e.message);
-  }
+async function getGistData() {
+  let r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    headers:{Authorization:`token ${GITHUB_TOKEN}`}
+  });
+  let d = await r.json();
+  return JSON.parse(d.files['data.json'].content);
 }
 
-async function saveToServer() {
-  try {
-    let post = {
-      categories, lines,
-      notice_enabled, notice_title, notice_text,
-      copyright_text, cardStyle, cardIconCenter,
-      maintainMode, mt_title, mt_desc,
-      admin_pwd_hash
-    };
-    await fetch('api.php?action=save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(post)
-    });
-  } catch(e) {
-    alert('保存失败：' + e.message);
-  }
+async function setGistData(data) {
+  await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    method:'PATCH',
+    headers:{Authorization:`token ${GITHUB_TOKEN}`,'Content-Type':'application/json'},
+    body:JSON.stringify({
+      files:{
+        "data.json":{content:JSON.stringify(data,null,2)}
+      }
+    })
+  });
+}
+
+function packAll() {
+  return {
+    categories, lines, cardStyle, cardIconCenter,
+    maintainMode, mt_title, mt_desc,
+    notice_enabled, notice_title, notice_text,
+    copyright_text, pwd_hash:getPwdHash()
+  };
+}
+
+function unpackAll(data) {
+  categories     = data.categories || categories;
+  lines          = data.lines || lines;
+  cardStyle      = data.cardStyle ?? cardStyle;
+  cardIconCenter = data.cardIconCenter ?? cardIconCenter;
+  maintainMode   = data.maintainMode ?? maintainMode;
+  mt_title       = data.mt_title ?? mt_title;
+  mt_desc        = data.mt_desc ?? mt_desc;
+  notice_enabled = data.notice_enabled ?? notice_enabled;
+  notice_title   = data.notice_title ?? notice_title;
+  notice_text    = data.notice_text ?? notice_text;
+  copyright_text = data.copyright_text ?? copyright_text;
+  if(data.pwd_hash) setPwdHash(data.pwd_hash);
+  saveAllToLocal();
+}
+
+function saveAllToLocal() {
+  localStorage.setItem('cats', JSON.stringify(categories));
+  localStorage.setItem('lines', JSON.stringify(lines));
+  localStorage.setItem('cardStyle', cardStyle);
+  localStorage.setItem('cardIconCenter', cardIconCenter);
+  localStorage.setItem('maintain', maintainMode);
+  localStorage.setItem('mt_title', mt_title);
+  localStorage.setItem('mt_desc', mt_desc);
+  localStorage.setItem('notice_enabled', notice_enabled);
+  localStorage.setItem('notice_title', notice_title);
+  localStorage.setItem('notice_text', notice_text);
+  localStorage.setItem('copyright_text', copyright_text);
+}
+
+async function pushToGist() {
+  if(!confirm('确定上传到云端？')) return;
+  await setGistData(packAll());
+  alert('✅ 已上传到Gist云端');
+}
+
+async function pullFromGist() {
+  if(!confirm('将覆盖本地数据，确定拉取？')) return;
+  let data = await getGistData();
+  unpackAll(data);
+  renderAll();
+  alert('✅ 已从Gist拉取最新数据');
 }
 
 // ==============================================
-// 备份还原
+// 备份 / 还原
 // ==============================================
 function exportBackup() {
-  const data = {...allData, categories, lines, admin_pwd_hash};
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'text/plain'});
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([JSON.stringify(packAll(),null,2)],{type:'text/plain'});
   const a = document.createElement('a');
-  a.href = url;
-  a.download = '导航备份_'+new Date().getTime()+'.txt';
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nav-backup-'+Date.now()+'.txt';
   a.click();
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(a.href);
   alert('✅ 备份已导出');
 }
 
-async function importBackup() {
-  const input = document.getElementById('restoreFile');
-  if (!input.files?.[0]) { alert('请选择文件'); return; }
-  if (!confirm('还原会覆盖全部数据，确定？')) return;
-
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      categories = data.categories || categories;
-      lines = data.lines || lines;
-      notice_enabled = data.notice_enabled ?? notice_enabled;
-      notice_title = data.notice_title ?? notice_title;
-      notice_text = data.notice_text ?? notice_text;
-      copyright_text = data.copyright_text ?? copyright_text;
-      cardStyle = data.cardStyle ?? cardStyle;
-      cardIconCenter = data.cardIconCenter ?? cardIconCenter;
-      maintainMode = data.maintainMode ?? maintainMode;
-      mt_title = data.mt_title ?? mt_title;
-      mt_desc = data.mt_desc ?? mt_desc;
-      if (data.admin_pwd_hash) admin_pwd_hash = data.admin_pwd_hash;
-
-      await saveToServer();
-      renderCategoryAdmin();
-      refreshCatSelect();
-      renderHome();
-      renderAdminLine();
+function importBackup() {
+  let f = document.getElementById('restoreFile').files[0];
+  if(!f) { alert('选择文件'); return; }
+  let r = new FileReader();
+  r.onload = e=>{
+    try{
+      let d = JSON.parse(e.target.result);
+      unpackAll(d);
+      renderAll();
       alert('✅ 还原成功');
       location.reload();
-    } catch (err) {
-      alert('文件格式错误');
-    }
+    }catch(e){alert('格式错误')}
   };
-  reader.readAsText(input.files[0]);
+  r.readAsText(f);
 }
 
 // ==============================================
-// 分类/导航/日志等
+// 渲染
 // ==============================================
-function toggleCategoryVisible(index) {
-  categories[index].hidden = !categories[index].hidden;
-  saveToServer();
-  renderCategoryAdmin(); renderHome();
+function renderAll() {
+  renderCategoryAdmin(); renderHome(); renderAdminLine(); refreshCatSelect(); loadCopyright();
 }
-
-async function batchUpdateCategoryIcon() {
-  let ico = document.getElementById('batchCategoryIcon').value.trim();
-  if (!ico) { alert('请输入图标'); return; }
-  if (!confirm('确定全部替换？')) return;
-  categories.forEach(c => c.icon = ico);
-  await saveToServer();
-  renderCategoryAdmin(); renderHome();
-  alert('✅ 批量完成');
-}
-
-function getAdminLog() {
-  return JSON.parse(localStorage.getItem('admin_login_log') || '[]');
-}
-function addAdminLog(success) {
-  let log = getAdminLog();
-  log.unshift({time:nowStr(), ip:getIP(), success});
-  if (log.length>100) log = log.slice(0,100);
-  localStorage.setItem('admin_login_log', JSON.stringify(log));
-}
-function renderAdminLog() {
-  let log = getAdminLog();
-  let dom = document.getElementById('logList');
-  dom.innerHTML = '';
-  log.forEach(item => {
-    let cls = item.success ? 'log-success' : 'log-fail';
-    let txt = item.success ? '登录成功' : '登录失败';
-    dom.innerHTML += `<div class="log-item"><span class="log-time">${item.time}</span>｜IP: ${item.ip}｜<span class="${cls}">${txt}</span></div>`;
-  });
-}
-function clearAdminLog() {
-  if (!confirm('确定清空？')) return;
-  localStorage.removeItem('admin_login_log');
-  renderAdminLog();
-}
-
-function toggleLineVisible(index) {
-  lines[index].hidden = !lines[index].hidden;
-  saveToServer();
-  renderAdminLine(); renderHome();
+function loadCopyright() {
+  let t = encodeHTML(copyright_text);
+  document.getElementById('splash_copyright').innerText = t;
+  document.getElementById('notice_copyright').innerText = t;
+  document.getElementById('maintain_copyright').innerText = t;
+  document.getElementById('login_copyright').innerText = t;
+  document.getElementById('home_copyright').innerText = t;
+  document.getElementById('admin_copyright').innerText = t;
 }
 
 function toggleCollapse(id) {
-  let body = document.getElementById(id);
-  let arr  = document.getElementById('arr_'+id);
-  body.classList.toggle('show');
-  arr.innerText = body.classList.contains('show') ? '▼' : '▶';
+  let b = document.getElementById(id);
+  let a = document.getElementById('arr_'+id);
+  b.classList.toggle('show');
+  a.innerText = b.classList.contains('show') ? '▼' : '▶';
 }
 
 function show(id) {
-  ['splash','notice','maintain','login','home','admin','editModal'].forEach(i => {
-    document.getElementById(i).style.display = 'none';
+  ['splash','notice','maintain','login','home','admin','editModal'].forEach(i=>{
+    document.getElementById(i).style.display='none';
   });
-  if (maintainMode && !isAdminLoggedIn()) {
-    document.getElementById('maintain').style.display = 'flex';
-    return;
+  if(maintainMode && !isAdminLoggedIn()){
+    document.getElementById('maintain').style.display='flex'; return;
   }
-  if (['splash','notice','maintain','editModal'].includes(id)) {
-    document.getElementById(id).style.display = 'flex';
-  } else {
-    document.getElementById(id).style.display = 'block';
+  if(['splash','notice','maintain','editModal'].includes(id)){
+    document.getElementById(id).style.display='flex';
+  }else{
+    document.getElementById(id).style.display='block';
   }
-  loadAllCopyright();
-  if (id === 'admin') renderAdminLog();
+  loadCopyright();
 }
 
-function loadAllCopyright() {
-  const txt = encodeHTML(copyright_text);
-  document.getElementById('splash_copyright').innerText = txt;
-  document.getElementById('notice_copyright').innerText = txt;
-  document.getElementById('maintain_copyright').innerText = txt;
-  document.getElementById('login_copyright').innerText = txt;
-  document.getElementById('home_copyright').innerText = txt;
-  document.getElementById('admin_copyright').innerText = txt;
+function showLogin() {
+  document.getElementById('pwd').value='';
+  document.getElementById('rememberPwd').checked=false;
+  show('login');
 }
 
-async function saveCardStyle() {
-  cardStyle = document.getElementById('cardStyleSelect').value;
-  cardIconCenter = document.getElementById('cardIconCenter').checked;
-  await saveToServer();
-  renderHome();
-  alert("🎨 样式已保存");
-}
-
-function moveUp(index) {
-  if(index<=0) return;
-  [lines[index-1], lines[index]] = [lines[index], lines[index-1]];
-  saveToServer();
-  renderAdminLine(); renderHome();
-}
-function moveDown(index) {
-  if(index>=lines.length-1) return;
-  [lines[index], lines[index+1]] = [lines[index+1], lines[index]];
-  saveToServer();
-  renderAdminLine(); renderHome();
-}
-
-async function updatePassword() {
-  let oldPwd = document.getElementById('old_pwd').value.trim();
-  let newPwd = document.getElementById('new_pwd').value.trim();
-  let confirmPwd = document.getElementById('confirm_pwd').value.trim();
-  if(!oldPwd || !newPwd || !confirmPwd) { alert("请填写完整"); return; }
-  if(newPwd !== confirmPwd) { alert("两次不一致"); return; }
-  if(md5(oldPwd) !== admin_pwd_hash) { alert("原密码错误"); return; }
-  admin_pwd_hash = md5(newPwd);
-  await saveToServer();
-  document.getElementById('old_pwd').value='';
-  document.getElementById('new_pwd').value='';
-  document.getElementById('confirm_pwd').value='';
-  alert("✅ 密码已修改");
-}
-
-async function resetPassword() {
-  if(!confirm("重置为默认？")) return;
-  admin_pwd_hash = md5(DEFAULT_PWD);
-  await saveToServer();
-  alert("🔄 已重置为：668899");
-}
+function closeNotice(){show('login');}
 
 // ==============================================
-// 分类
+// 分类 & 导航
 // ==============================================
+function refreshCatSelect() {
+  let a = document.getElementById('add_cid');
+  let e = document.getElementById('edit_cid');
+  a.innerHTML=''; e.innerHTML='';
+  categories.forEach(c=>{
+    a.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+    e.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+  });
+}
+
 function renderCategoryAdmin() {
-  let dom = document.getElementById('categoryList'); dom.innerHTML = '';
+  let dom = document.getElementById('categoryList'); dom.innerHTML='';
   categories.forEach((c,i)=>{
-    let icon = encodeHTML(c.icon || '📁');
-    let name = encodeHTML(c.name);
-    let btnText = c.hidden ? '👁️ 显示' : '🙈 隐藏';
-    dom.innerHTML += `
+    let vis = c.hidden ? '👁️显示' : '🙈隐藏';
+    dom.innerHTML+=`
     <div class="manager-line">
-      <div class="name">${icon} ${name}</div>
+      <div class="name">${c.icon||''} ${c.name}</div>
       <div>
-        <button class="btn-toggle" onclick="toggleCategoryVisible(${i})">${btnText}</button>
-        <button class="btn-del" onclick="delCategory(${i})">删除</button>
+        <button class="btn-toggle" onclick="toggleCat(${i})">${vis}</button>
+        <button class="btn-del" onclick="delCat(${i})">删除</button>
       </div>
     </div>`;
   });
 }
 
-async function addCategory() {
-  let name = document.getElementById('add_category_name').value.trim();
-  let icon = document.getElementById('add_category_icon').value.trim() || '📁';
-  if(!name) { alert("请输入名称"); return; }
-  let maxId = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
-  categories.push({id:maxId+1, name, icon, hidden:false});
-  await saveToServer();
+function toggleCat(i){
+  categories[i].hidden = !categories[i].hidden;
+  saveAllToLocal(); renderAll();
+}
+function delCat(i){
+  if(categories.length<=1)return alert('至少保留一个');
+  if(!confirm('确定删除？'))return;
+  let id = categories[i].id;
+  categories.splice(i,1);
+  lines.forEach(x=>{if(x.cid===id)x.cid=categories[0].id;});
+  saveAllToLocal(); renderAll();
+}
+function addCategory(){
+  let n = document.getElementById('add_category_name').value.trim();
+  let ic= document.getElementById('add_category_icon').value.trim()||'📁';
+  if(!n)return alert('请输入名称');
+  let mid = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
+  categories.push({id:mid+1,name:n,icon:ic,hidden:false});
+  saveAllToLocal();
   document.getElementById('add_category_name').value='';
   document.getElementById('add_category_icon').value='';
-  renderCategoryAdmin(); refreshCatSelect(); alert("✅ 添加成功");
-}
-
-async function delCategory(index) {
-  if(categories.length <=1) { alert("至少保留一个"); return; }
-  if(!confirm("确定删除？")) return;
-  let delId = categories[index].id;
-  categories.splice(index,1);
-  lines.forEach(it=>{ if(it.cid===delId) it.cid = categories[0].id; });
-  await saveToServer();
-  renderCategoryAdmin(); refreshCatSelect(); renderAdminLine(); renderHome(); alert("🗑️ 已删除");
-}
-
-function refreshCatSelect() {
-  let addSel = document.getElementById('add_cid');
-  let editSel = document.getElementById('edit_cid');
-  addSel.innerHTML = ''; editSel.innerHTML = '';
-  categories.forEach(c=>{
-    let opt = `<option value="${c.id}">${encodeHTML(c.icon||'📁')} ${encodeHTML(c.name)}</option>`;
-    addSel.innerHTML += opt; editSel.innerHTML += opt;
-  });
+  renderAll(); alert('✅ 添加成功');
 }
 
 // ==============================================
-// 首页渲染
+// 首页导航
 // ==============================================
 function renderHome() {
-  let dom = document.getElementById('lineList'); dom.innerHTML = '';
-  categories.filter(c => !c.hidden).forEach(cat=>{
-    let items = lines.filter(it=>it.cid===cat.id && !it.hidden);
-    if(items.length===0) return;
-    let catIcon = encodeHTML(cat.icon||'📁');
-    let catName = encodeHTML(cat.name);
-    dom.innerHTML += `<div class="category-title">${catIcon} ${catName}</div>`;
-    items.forEach(it=>{
-      let icon = encodeHTML(it.icon||'🔗');
-      let name = encodeHTML(it.name);
-      let url  = safeUrl(it.url);
-      let cls = `nav-card ${cardStyle} ${cardIconCenter ? 'center' : ''}`;
-      dom.innerHTML += `
-        <div class="${cls}" onclick="window.open('${url}','_blank')">
-          <div class="nav-icon">${icon}</div>
-          <div class="nav-text">${name}</div>
+  let dom = document.getElementById('lineList'); dom.innerHTML='';
+  categories.filter(c=>!c.hidden).forEach(cat=>{
+    let its = lines.filter(it=>it.cid===cat.id && !it.hidden);
+    if(its.length===0)return;
+    dom.innerHTML+=`<div class="category-title">${cat.icon||''} ${cat.name}</div>`;
+    its.forEach(it=>{
+      let cls = `nav-card ${cardStyle} ${cardIconCenter?'center':''}`;
+      dom.innerHTML+=`
+        <div class="${cls}" onclick="window.open('${safeUrl(it.url)}','_blank')">
+          <div class="nav-icon">${it.icon||'🔗'}</div>
+          <div class="nav-text">${encodeHTML(it.name)}</div>
         </div>`;
     });
   });
 }
 
 function renderAdminLine() {
-  let dom = document.getElementById('adminLineList'); dom.innerHTML = '';
+  let dom = document.getElementById('adminLineList'); dom.innerHTML='';
   lines.forEach((it,i)=>{
-    let icon = encodeHTML(it.icon||'🔗');
-    let name = encodeHTML(it.name);
-    let cat = categories.find(c=>c.id===it.cid);
-    let catShow = cat ? `${cat.icon||''} ${cat.name}` : '默认';
-    let visText = it.hidden ? '🙈 显示' : '👁️ 隐藏';
-    dom.innerHTML += `
+    let c = categories.find(x=>x.id===it.cid);
+    let vis = it.hidden ? '🙈显示' : '👁️隐藏';
+    dom.innerHTML+=`
       <div class="manager-line">
         <div class="sort-btns">
-          <button onclick="moveUp(${i})">↑</button>
-          <button onclick="moveDown(${i})">↓</button>
+          <button onclick="up(${i})">↑</button>
+          <button onclick="down(${i})">↓</button>
         </div>
-        <div class="name">${icon} ${name} (${catShow})</div>
+        <div class="name">${it.icon||''} ${it.name} (${c?c.name:'-'})</div>
         <div>
-          <button class="btn-toggle" onclick="toggleLineVisible(${i})">${visText}</button>
+          <button class="btn-toggle" onclick="toggleLine(${i})">${vis}</button>
           <button class="btn-edit" onclick="openEdit(${i})">修改</button>
           <button class="btn-del" onclick="delLine(${i})">删除</button>
         </div>
@@ -804,149 +646,124 @@ function renderAdminLine() {
   });
 }
 
-async function addLine() {
-  let n = document.getElementById('add_name').value.trim();
-  let u = document.getElementById('add_url').value.trim();
-  let ic= document.getElementById('add_icon').value.trim() || '🔗';
-  let cid= parseInt(document.getElementById('add_cid').value);
-  if(!n || !u) { alert("名称和地址不能为空"); return; }
-  lines.push({name:n, url:u, icon:ic, cid, hidden:false});
-  await saveToServer();
+function up(i){if(i<=0)return;[lines[i-1],lines[i]]=[lines[i],lines[i-1]];saveAllToLocal();renderAll();}
+function down(i){if(i>=lines.length-1)return;[lines[i],lines[i+1]]=[lines[i+1],lines[i]];saveAllToLocal();renderAll();}
+function toggleLine(i){lines[i].hidden=!lines[i].hidden;saveAllToLocal();renderAll();}
+function delLine(i){if(!confirm('确定删除？'))return;lines.splice(i,1);saveAllToLocal();renderAll();}
+function addLine(){
+  let n=document.getElementById('add_name').value.trim();
+  let u=document.getElementById('add_url').value.trim();
+  let ic=document.getElementById('add_icon').value.trim()||'🔗';
+  let cid=+document.getElementById('add_cid').value;
+  if(!n||!u)return alert('名称/地址不能为空');
+  lines.push({name:n,url:u,icon:ic,cid,hidden:false});
+  saveAllToLocal();
   document.getElementById('add_name').value='';
   document.getElementById('add_url').value='';
   document.getElementById('add_icon').value='';
-  renderAdminLine(); renderHome(); alert("✅ 添加成功");
+  renderAll(); alert('✅ 添加成功');
+}
+function openEdit(i){editIndex=i;let it=lines[i];
+document.getElementById('edit_name').value=it.name;
+document.getElementById('edit_url').value=it.url;
+document.getElementById('edit_icon').value=it.icon||'';
+document.getElementById('edit_cid').value=it.cid;
+document.getElementById('editModal').style.display='flex';
+}
+function closeEdit(){document.getElementById('editModal').style.display='none';}
+function saveEdit(){
+  let n=document.getElementById('edit_name').value.trim();
+  let u=document.getElementById('edit_url').value.trim();
+  let ic=document.getElementById('edit_icon').value.trim()||'🔗';
+  let cid=+document.getElementById('edit_cid').value;
+  if(!n||!u)return alert('不能为空');
+  lines[editIndex]={...lines[editIndex],name:n,url:u,icon:ic,cid};
+  saveAllToLocal(); renderAll(); closeEdit(); alert('✅ 已保存');
 }
 
-function openEdit(i) {
-  if(i<0||i>=lines.length) return;
-  editIndex = i;
-  let it = lines[i];
-  document.getElementById('edit_name').value = it.name||'';
-  document.getElementById('edit_url').value = it.url||'';
-  document.getElementById('edit_icon').value = it.icon||'';
-  document.getElementById('edit_cid').value = it.cid;
-  document.getElementById('editModal').style.display = 'flex';
+// ==============================================
+// 设置
+// ==============================================
+function saveCardStyle(){
+  cardStyle=document.getElementById('cardStyleSelect').value;
+  cardIconCenter=document.getElementById('cardIconCenter').checked;
+  localStorage.setItem('cardStyle',cardStyle);
+  localStorage.setItem('cardIconCenter',cardIconCenter);
+  renderHome(); alert('🎨 已保存');
 }
-function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
-
-async function saveEdit() {
-  let n = document.getElementById('edit_name').value.trim();
-  let u = document.getElementById('edit_url').value.trim();
-  let ic= document.getElementById('edit_icon').value.trim() || '🔗';
-  let cid= parseInt(document.getElementById('edit_cid').value);
-  if(!n || !u) { alert("不能为空"); return; }
-  lines[editIndex] = {...lines[editIndex], name:n, url:u, icon:ic, cid};
-  await saveToServer();
-  renderAdminLine(); renderHome(); closeEdit(); alert("✅ 修改成功");
+function saveNotice(){
+  notice_enabled=document.getElementById('notice_enabled').checked;
+  notice_title=document.getElementById('notice_title').value.trim();
+  notice_text=document.getElementById('notice_text').value.trim();
+  localStorage.setItem('notice_enabled',notice_enabled);
+  localStorage.setItem('notice_title',notice_title);
+  localStorage.setItem('notice_text',notice_text);
+  alert('✅ 公告已保存');
 }
-
-async function delLine(i) {
-  if(!confirm("确定删除？")) return;
-  lines.splice(i,1);
-  await saveToServer();
-  renderAdminLine(); renderHome(); alert("🗑️ 已删除");
+function saveSet(){
+  mt_title=document.getElementById('set_title').value;
+  mt_desc=document.getElementById('set_desc').value;
+  localStorage.setItem('mt_title',mt_title);
+  localStorage.setItem('mt_desc',mt_desc);
+  document.getElementById('mt_title').innerText=mt_title;
+  document.getElementById('mt_desc').innerText=mt_desc;
+  alert('✅ 已保存');
 }
-
-function closeNotice() { show('login'); }
-
-async function saveCopyright() {
-  let txt = document.getElementById('copyright_text').value.trim();
-  if(!txt) { alert("请输入内容"); return; }
-  copyright_text = txt;
-  await saveToServer();
-  loadAllCopyright(); alert("✅ 已保存");
+function saveCopyright(){
+  copyright_text=document.getElementById('copyright_text').value.trim();
+  localStorage.setItem('copyright_text',copyright_text);
+  loadCopyright(); alert('✅ 已保存');
 }
+function openMt(){localStorage.setItem('maintain','1');maintainMode=true;show('maintain');alert('🔒 已开启维护');}
+function closeMt(){localStorage.setItem('maintain','0');maintainMode=false;show('home');alert('🔓 已关闭');}
 
-async function saveNotice() {
-  let en = document.getElementById('notice_enabled').checked;
-  let t = document.getElementById('notice_title').value.trim();
-  let c = document.getElementById('notice_text').value.trim();
-  if(!t || !c) { alert("标题和内容不能为空"); return; }
-  notice_enabled = en; notice_title = t; notice_text = c;
-  await saveToServer();
-  alert("✅ 公告已保存");
+function updatePassword(){
+  let o=document.getElementById('old_pwd').value.trim();
+  let n=document.getElementById('new_pwd').value.trim();
+  let c=document.getElementById('confirm_pwd').value.trim();
+  if(!o||!n||!c)return alert('请填写完整');
+  if(n!==c)return alert('两次不一致');
+  if(md5(o)!==getPwdHash())return alert('原密码错误');
+  setPwdHash(md5(n));
+  document.getElementById('old_pwd').value='';
+  document.getElementById('new_pwd').value='';
+  document.getElementById('confirm_pwd').value='';
+  alert('✅ 密码已修改');
 }
+function resetPassword(){if(!confirm('重置为668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 已重置');}
 
-async function saveSet() {
-  mt_title = document.getElementById('set_title').value;
-  mt_desc  = document.getElementById('set_desc').value;
-  await saveToServer();
-  document.getElementById('mt_title').innerText = encodeHTML(mt_title);
-  document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
-  alert("✅ 已保存");
-}
-
-async function openMt() {
-  maintainMode = true;
-  await saveToServer();
-  show('maintain');
-  alert("🔒 已开启维护");
-}
-async function closeMt() {
-  maintainMode = false;
-  await saveToServer();
-  show('home');
-  alert("🔓 已关闭维护");
-}
-
-function showLogin() {
-  document.getElementById('pwd').value = '';
-  document.getElementById('rememberPwd').checked = false;
-  show('login');
-}
-
-document.getElementById('userLoginBtn').onclick = ()=>{
-  let inputPwd = document.getElementById('pwd').value.trim();
-  let ok = md5(inputPwd) === admin_pwd_hash;
-  addAdminLog(ok);
-  if(!ok) { alert("密码错误"); return; }
-  setAdminLoggedIn();
-  show('home');
+// ==============================================
+// 登录
+// ==============================================
+document.getElementById('userLoginBtn').onclick=()=>{
+  let v=document.getElementById('pwd').value.trim();
+  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('密码错误');
 };
-
-document.getElementById('adminLoginBtn').onclick = ()=>{
-  let inputPwd = document.getElementById('pwd').value.trim();
-  let ok = md5(inputPwd) === admin_pwd_hash;
-  addAdminLog(ok);
-  if(!ok) { alert("密码错误"); return; }
-  setAdminLoggedIn();
-  show('admin');
+document.getElementById('adminLoginBtn').onclick=()=>{
+  let v=document.getElementById('pwd').value.trim();
+  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('密码错误');
 };
 
 // ==============================================
-// 初始化
+// 启动
 // ==============================================
-async function init() {
-  await loadFromServer();
-
-  document.getElementById('mt_title').innerText = encodeHTML(mt_title);
-  document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
-  document.getElementById('notice_enabled').checked = notice_enabled;
-  document.getElementById('notice_title').value = notice_title;
-  document.getElementById('notice_text').value = notice_text;
-  document.getElementById('copyright_text').value = copyright_text;
-  document.getElementById('cardStyleSelect').value = cardStyle;
-  document.getElementById('cardIconCenter').checked = cardIconCenter;
-
-  renderCategoryAdmin();
-  refreshCatSelect();
-  renderHome();
-  renderAdminLine();
-  loadAllCopyright();
-
+function init(){
+  document.getElementById('mt_title').innerText=mt_title;
+  document.getElementById('mt_desc').innerText=mt_desc;
+  document.getElementById('notice_enabled').checked=notice_enabled;
+  document.getElementById('notice_title').value=notice_title;
+  document.getElementById('notice_text').value=notice_text;
+  document.getElementById('copyright_text').value=copyright_text;
+  document.getElementById('cardStyleSelect').value=cardStyle;
+  document.getElementById('cardIconCenter').checked=cardIconCenter;
+  renderAll();
   setTimeout(()=>{
-    if (maintainMode) {
-      show('maintain');
-    } else {
-      show(notice_enabled ? 'notice' : 'home');
-      if (notice_enabled) {
-        document.getElementById('notice_content').innerText = notice_text;
-      }
+    if(maintainMode){show('maintain');}else{
+      show(notice_enabled?'notice':'home');
+      if(notice_enabled)document.getElementById('notice_content').innerText=notice_text;
     }
-  }, 900);
+  },800);
 }
-
 init();
 </script>
 </body>

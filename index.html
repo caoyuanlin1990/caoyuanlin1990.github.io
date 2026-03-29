@@ -3,81 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>闲时导航</title>
+<title>闲时导航 - Gist云端同步+网络备份恢复</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif;}
-html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-items:center;justify-content:center;padding:12px;}
-:root{--primary:#165DFF;--success:#00B42A;--danger:#F53F3F;--warning:#FF7D00;--neutral:#86909C;--light:#F2F3F5;--card-bg:#fff;--border:#E5E6EB;--radius:16px;--shadow:0 2px 12px rgba(0,0,0,0.06);--text-main:#1D2129;--text-normal:#4E5969;}
-.nav-card{background:var(--card-bg);padding:16px 14px;margin-bottom:8px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
-.nav-card:hover{border-color:var(--primary);background:#F7F8FF;}
-.nav-card.round{border-radius:16px;}
-.nav-card.square{border-radius:0;}
-.nav-card.flat{border-radius:8px;border:none;background:#f2f3f7;}
-.nav-card.center .nav-icon{margin:0 auto;}
-.nav-icon{width:34px;height:34px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.nav-text{flex:1;font-size:15px;font-weight:500;color:var(--text-main);}
-#splash{position:fixed;top:0;left:0;width:100%;height:100vh;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;color:var(--primary);gap:16px;}
-.splash-icon{font-size:52px;}
-.splash-title{font-size:26px;font-weight:600;color:var(--text-main);}
-.splash-desc{font-size:14px;color:var(--neutral);}
-.splash-footer{position:absolute;bottom:36px;font-size:12px;color:var(--neutral);}
-#notice{position:fixed;top:0;left:0;width:100%;height:100vh;background:#F7F8FA;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:30px;}
-.notice-box{background:var(--card-bg);border-radius:var(--radius);padding:30px 24px;width:100%;max-width:380px;box-shadow:var(--shadow);border:1px solid var(--border);}
-.notice-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:18px;color:var(--text-main);}
-.notice-content{font-size:15px;line-height:1.7;color:var(--text-normal);white-space:pre-line;margin-bottom:24px;min-height:100px;}
-.notice-btn{width:100%;padding:13px;border-radius:10px;background:var(--primary);color:#fff;font-size:15px;font-weight:500;border:none;cursor:pointer;}
-#editModal{position:fixed;top:0;left:0;width:100%;height:100vh;background:rgba(0,0,0,0.25);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
-.modal-box{background:var(--card-bg);border-radius:var(--radius);padding:24px;width:100%;max-width:360px;box-shadow:0 8px 25px rgba(0,0,0,0.1);border:1px solid var(--border);}
-.modal-title{font-size:17px;font-weight:600;margin-bottom:16px;text-align:center;color:var(--text-main);}
-.modal-input,.modal-select{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:12px;font-size:15px;}
-.modal-btns{display:flex;gap:10px;margin-top:10px;}
-.modal-btns button{flex:1;padding:11px;border-radius:10px;border:none;font-size:15px;font-weight:500;cursor:pointer;}
-.btn-cancel{background:var(--light);color:var(--text-normal);}
-.btn-save{background:var(--primary);color:#fff;}
-#maintain{position:fixed;inset:0;z-index:999;background:#F7F8FA;display:none;align-items:center;justify-content:center;padding:20px;}
-.maintain-box{background:var(--card-bg);border-radius:var(--radius);padding:40px 30px;width:100%;max-width:400px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);}
-.maintain-icon{font-size:48px;margin-bottom:20px;color:var(--neutral);}
-.maintain-title{font-size:20px;font-weight:600;margin-bottom:10px;color:var(--text-main);}
-.maintain-desc{font-size:15px;color:var(--text-normal);line-height:1.5;margin-bottom:20px;}
-#adminLoginBtnInMaintain{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--card-bg);font-size:18px;cursor:pointer;color:var(--primary);margin-top:12px;}
-#login{width:100%;max-width:360px;background:var(--card-bg);border-radius:var(--radius);padding:40px 30px;box-shadow:var(--shadow);border:1px solid var(--border);display:none;position:relative;}
-.login-footer{text-align:center;margin-top:28px;font-size:12px;color:var(--neutral);}
-.admin-icon-btn{position:absolute;top:20px;right:20px;background:transparent;border:none;font-size:18px;color:var(--primary);cursor:pointer;}
-.login-title{font-size:22px;font-weight:600;text-align:center;margin-bottom:28px;color:var(--text-main);}
-.login-input{width:100%;padding:13px 16px;border-radius:10px;border:1px solid var(--border);font-size:15px;margin-bottom:18px;text-align:center;}
-.remember-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;font-size:14px;color:var(--text-normal);}
-.btn{width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:500;cursor:pointer;}
-.btn-primary{background:var(--primary);color:#fff;}
-#home{width:100%;max-width:380px;background:var(--card-bg);border-radius:var(--radius);padding:30px 20px 70px;box-shadow:var(--shadow);border:1px solid var(--border);display:none;position:relative;}
-.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
-.head-title{font-size:20px;font-weight:600;color:var(--text-main);}
-.back-btn{font-size:18px;color:var(--primary);cursor:pointer;font-weight:500;}
-.category-title{font-size:16px;font-weight:600;color:var(--text-main);margin:16px 0 8px;padding-left:4px;display:flex;align-items:center;gap:6px;}
-.home-footer{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:12px;color:var(--neutral);}
-#admin{width:100%;max-width:380px;background:var(--card-bg);border-radius:var(--radius);padding:30px 20px;box-shadow:var(--shadow);border:1px solid var(--border);display:none;position:relative;}
-.admin-footer{text-align:center;margin-top:28px;font-size:12px;color:var(--neutral);}
-.collapse-header{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:15px;font-weight:500;cursor:pointer;user-select:none;color:var(--text-main);}
-.collapse-arrow{font-size:13px;color:var(--neutral);transition:transform .2s;}
-.collapse-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
-.collapse-body.show{max-height:1000px;}
-.section{margin-bottom:16px;}
-.form-input,.form-text,.form-select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);font-size:15px;margin-bottom:10px;background:#fff;}
-.form-text{min-height:70px;resize:vertical;}
-.btn-group{display:flex;gap:8px;margin-top:6px;}
-.btn-group .btn{flex:1;}
-.btn-success{background:var(--success);color:#fff;}
-.btn-danger{background:var(--danger);color:#fff;}
-.form-switch{display:flex;align-items:center;margin-bottom:10px;font-size:15px;color:var(--text-normal);}
-.form-switch input{transform:scale(1.1);margin-right:8px;}
-.manager-line{display:flex;align-items:center;padding:13px;background:var(--light);border-radius:10px;margin-bottom:8px;}
-.manager-line .name{flex:1;font-size:15px;color:var(--text-main);}
-.manager-line .sort-btns{display:flex;gap:4px;margin-right:6px;}
-.manager-line .sort-btns button{width:28px;height:28px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:14px;cursor:pointer;}
-.manager-line button{border:none;padding:6px 10px;border-radius:8px;font-size:13px;margin-left:6px;cursor:pointer;color:#fff;}
-.btn-edit{background:var(--warning);}
-.btn-del{background:var(--danger);}
-.btn-toggle{background:var(--primary);}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
+}
+html,body {
+  width:100%;
+  min-height:100vh;
+  background:#F7F8FA;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+}
+:root {
+  --primary:#165DFF; --success:#00B42A; --danger:#F53F3F;
+  --warning:#FF7D00; --neutral:#86909C; --light:#F2F3F5;
+  --card-bg:#fff; --border:#E5E6EB; --radius:16px;
+  --shadow:0 2px 12px rgba(0,0,0,0.06);
+  --text-main:#1D2129; --text-normal:#4E5969;
+}
+.nav-card {
+  background:var(--card-bg); padding:16px 14px; margin-bottom:8px;
+  border:1px solid var(--border); display:flex; align-items:center; gap:12px;
+  cursor:pointer; transition:all 0.2s;
+}
+.nav-card:hover { border-color:var(--primary); background:#F7F8FF; }
+.nav-card.round { border-radius:16px; }
+.nav-card.square { border-radius:0; }
+.nav-card.flat { border-radius:8px; border:none; background:#f2f3f7; }
+.nav-card.center .nav-icon { margin:0 auto; }
+.nav-icon {
+  width:34px; height:34px; background:var(--primary); color:#fff;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.nav-text { flex:1; font-size:15px; font-weight:500; color:var(--text-main); }
+
+#splash {
+  position:fixed; top:0; left:0; width:100%; height:100vh;
+  background:#fff; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; z-index:99999; color:var(--primary); gap:16px;
+}
+.splash-icon { font-size:52px; }
+.splash-title { font-size:26px; font-weight:600; color:var(--text-main); }
+.splash-desc { font-size:14px; color:var(--neutral); }
+.splash-footer { position:absolute; bottom:36px; font-size:12px; color:var(--neutral); }
+
+#notice {
+  position:fixed; top:0; left:0; width:100%; height:100vh;
+  background:#F7F8FA; display:none; flex-direction:column; align-items:center;
+  justify-content:center; z-index:9999; padding:30px;
+}
+.notice-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:30px 24px;
+  width:100%; max-width:380px; box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.notice-title { font-size:18px; font-weight:600; text-align:center; margin-bottom:18px; color:var(--text-main); }
+.notice-content { font-size:15px; line-height:1.7; color:var(--text-normal); white-space:pre-line; margin-bottom:24px; min-height:100px; }
+.notice-btn { width:100%; padding:13px; border-radius:10px; background:var(--primary); color:#fff; font-size:15px; font-weight:500; border:none; cursor:pointer; }
+
+#editModal {
+  position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.25);
+  display:none; align-items:center; justify-content:center; z-index:9999; padding:20px;
+}
+.modal-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:24px;
+  width:100%; max-width:360px; box-shadow:0 8px 25px rgba(0,0,0,0.1); border:1px solid var(--border);
+}
+.modal-title { font-size:17px; font-weight:600; margin-bottom:16px; text-align:center; color:var(--text-main); }
+.modal-input,.modal-select { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border); margin-bottom:12px; font-size:15px; }
+.modal-btns { display:flex; gap:10px; margin-top:10px; }
+.modal-btns button { flex:1; padding:11px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
+.btn-cancel { background:var(--light); color:var(--text-normal); }
+.btn-save { background:var(--primary); color:#fff; }
+
+#maintain {
+  position:fixed; inset:0; z-index:999; background:#F7F8FA;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.maintain-box {
+  background:var(--card-bg); border-radius:var(--radius); padding:40px 30px;
+  width:100%; max-width:400px; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow);
+}
+.maintain-icon { font-size:48px; margin-bottom:20px; color:var(--neutral); }
+.maintain-title { font-size:20px; font-weight:600; margin-bottom:10px; color:var(--text-main); }
+.maintain-desc { font-size:15px; color:var(--text-normal); line-height:1.5; margin-bottom:20px; }
+#adminLoginBtnInMaintain {
+  width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
+  background:var(--card-bg); font-size:18px; cursor:pointer; color:var(--primary); margin-top:12px;
+}
+
+#login {
+  width:100%; max-width:360px; background:var(--card-bg); border-radius:var(--radius);
+  padding:40px 30px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.login-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
+.admin-icon-btn { position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:18px; color:var(--primary); cursor:pointer; }
+.login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:28px; color:var(--text-main); }
+.login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; }
+.remember-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; font-size:14px; color:var(--text-normal); }
+.btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
+.btn-primary { background:var(--primary); color:#fff; }
+
+#home {
+  width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
+  padding:30px 20px 70px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.head { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.head-title { font-size:20px; font-weight:600; color:var(--text-main); }
+.back-btn { font-size:18px; color:var(--primary); cursor:pointer; font-weight:500; }
+.category-title { font-size:16px; font-weight:600; color:var(--text-main); margin:16px 0 8px; padding-left:4px; display:flex; align-items:center; gap:6px; }
+.home-footer { position:absolute; bottom:20px; left:0; right:0; text-align:center; font-size:12px; color:var(--neutral); }
+
+#admin {
+  width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
+  padding:30px 20px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
+}
+.admin-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
+.collapse-header {
+  display:flex; justify-content:space-between; align-items:center; padding:12px 0;
+  font-size:15px; font-weight:500; cursor:pointer; user-select:none; color:var(--text-main);
+}
+.collapse-arrow { font-size:13px; color:var(--neutral); transition:transform 0.2s; }
+.collapse-body { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+.collapse-body.show { max-height:1000px; }
+.section { margin-bottom:16px; }
+.form-input,.form-text,.form-select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:10px; background:#fff; }
+.form-text { min-height:70px; resize:vertical; }
+.btn-group { display:flex; gap:8px; margin-top:6px; }
+.btn-group .btn { flex:1; }
+.btn-success { background:var(--success); color:#fff; }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-info { background:#4E5969; color:#fff; }
+.form-switch { display:flex; align-items:center; margin-bottom:10px; font-size:15px; color:var(--text-normal); }
+.form-switch input { transform:scale(1.1); margin-right:8px; }
+
+.manager-line {
+  display:flex; align-items:center; padding:13px; background:var(--light); border-radius:10px; margin-bottom:8px;
+}
+.manager-line .name { flex:1; font-size:15px; color:var(--text-main); }
+.manager-line .sort-btns { display:flex; gap:4px; margin-right:6px; }
+.manager-line .sort-btns button {
+  width:28px; height:28px; border-radius:6px; border:none; background:var(--primary); color:#fff; font-size:14px; cursor:pointer;
+}
+.manager-line button { border:none; padding:6px 10px; border-radius:8px; font-size:13px; margin-left:6px; cursor:pointer; color:#fff; }
+.btn-edit { background:var(--warning); }
+.btn-del { background:var(--danger); }
+.btn-toggle { background:var(--primary); }
+
+.log-item {
+  padding:8px 10px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-normal);
+}
+.log-time { color:var(--primary); }
+.log-ip { color:var(--success); }
+.log-fail { color:var(--danger); }
+.log-success { color:var(--success); }
 </style>
 </head>
 <body>
@@ -85,13 +171,13 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 <div id="splash">
   <div class="splash-icon">🧭</div>
   <div class="splash-title">闲时导航</div>
-  <div class="splash-desc">同步导航</div>
+  <div class="splash-desc">Gist云端同步 · 网络备份一键恢复</div>
   <div class="splash-footer" id="splash_copyright"></div>
 </div>
 
 <div id="notice">
   <div class="notice-box">
-    <div class="notice-title">📢 公告</div>
+    <div class="notice-title">📢 系统公告</div>
     <div class="notice-content" id="notice_content"></div>
     <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
     <div class="notice-footer" id="notice_copyright"></div>
@@ -101,9 +187,9 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 <div id="editModal">
   <div class="modal-box">
     <div class="modal-title">编辑导航</div>
-    <input class="modal-input" id="edit_name">
-    <input class="modal-input" id="edit_url">
-    <input class="modal-input" id="edit_icon">
+    <input class="modal-input" id="edit_name" placeholder="导航名称">
+    <input class="modal-input" id="edit_url" placeholder="跳转地址">
+    <input class="modal-input" id="edit_icon" placeholder="自定义图标">
     <select class="modal-select" id="edit_cid"></select>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeEdit()">取消</button>
@@ -115,8 +201,8 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 <div id="maintain">
   <div class="maintain-box">
     <div class="maintain-icon">🔧</div>
-    <div class="maintain-title" id="mt_title">维护中</div>
-    <div class="maintain-desc" id="mt_desc">维护中</div>
+    <div class="maintain-title" id="mt_title">系统维护中</div>
+    <div class="maintain-desc" id="mt_desc">升级维护中</div>
     <button id="adminLoginBtnInMaintain" onclick="show('login')">⚙️</button>
     <div class="maintain-footer" id="maintain_copyright"></div>
   </div>
@@ -124,11 +210,11 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 
 <div id="login">
   <button class="admin-icon-btn" id="adminLoginBtn">⚙️</button>
-  <div class="login-title">🔐 登录</div>
-  <input type="password" class="login-input" id="pwd" placeholder="输入密码">
+  <div class="login-title">🔐 安全登录</div>
+  <input type="password" class="login-input" id="pwd" placeholder="请输入登录密码">
   <div class="remember-row">
     <input type="checkbox" id="rememberPwd">
-    <label for="rememberPwd">记住</label>
+    <label for="rememberPwd">记住密码</label>
   </div>
   <button class="btn btn-primary" id="userLoginBtn">登录</button>
   <div class="login-footer" id="login_copyright"></div>
@@ -136,7 +222,7 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 
 <div id="home">
   <div class="head">
-    <div class="head-title">🧭 导航</div>
+    <div class="head-title">🧭 导航菜单</div>
     <div class="back-btn" onclick="showLogin()">返回</div>
   </div>
   <div id="lineList"></div>
@@ -151,30 +237,43 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('gistSyncCollapse')">
-      <span>☁️ 云端同步</span>
+      <span>☁️ Gist云端同步</span>
       <span class="collapse-arrow" id="arr_gistSyncCollapse">▶</span>
     </div>
     <div class="collapse-body" id="gistSyncCollapse">
-      <button class="btn btn-success" onclick="pullFromGist()" style="width:100%;margin-bottom:8px;">⬇️ 从指定地址拉取</button>
-      <button class="btn btn-primary" onclick="pushToGist()" style="width:100%">⬆️ 上传</button>
+      <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">从云端拉取最新数据会覆盖本地</div>
+      <button class="btn btn-success" onclick="pullFromGist()" style="width:100%;margin-bottom:8px;">⬇️ 从云端拉取数据</button>
+      <button class="btn btn-primary" onclick="pushToGist()" style="width:100%">⬆️ 上传数据到云端</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapse-header" onclick="toggleCollapse('cloudBackupCollapse')">
+      <span>🌐 网络备份一键恢复</span>
+      <span class="collapse-arrow" id="arr_cloudBackupCollapse">▶</span>
+    </div>
+    <div class="collapse-body" id="cloudBackupCollapse">
+      <div style="font-size:14px;color:var(--text-normal);margin-bottom:10px;">自动从指定地址恢复备份，恢复后自动同步到Gist</div>
+      <button class="btn btn-info" onclick="restoreFromNetBackup()" style="width:100%;margin-bottom:8px;">🔄 从网络地址恢复备份</button>
+      <button class="btn btn-success" onclick="restoreFromNetBackupAndPush()" style="width:100%">🔄 恢复并自动同步到Gist</button>
     </div>
   </div>
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
-      <span>💾 备份/还原</span>
+      <span>💾 本地备份/还原</span>
       <span class="collapse-arrow" id="arr_backupCollapse">▶</span>
     </div>
     <div class="collapse-body" id="backupCollapse">
-      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">导出备份</button>
+      <button class="btn btn-success" onclick="exportBackup()" style="width:100%;margin-bottom:8px;">💾 导出备份</button>
       <input type="file" id="restoreFile" accept=".txt" style="width:100%;margin-bottom:8px;">
-      <button class="btn btn-danger" onclick="importBackup()" style="width:100%">从备份还原</button>
+      <button class="btn btn-danger" onclick="importBackup()" style="width:100%">⚠️ 从本地文件还原</button>
     </div>
   </div>
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('styleCollapse')">
-      <span>🎨 卡片样式</span>
+      <span>🎨 导航卡片样式</span>
       <span class="collapse-arrow" id="arr_styleCollapse">▶</span>
     </div>
     <div class="collapse-body" id="styleCollapse">
@@ -182,13 +281,13 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
         <option value="default">默认圆角</option>
         <option value="round">大圆角</option>
         <option value="square">直角</option>
-        <option value="flat">无边框</option>
+        <option value="flat">简约无边框</option>
       </select>
       <div class="form-switch">
         <input type="checkbox" id="cardIconCenter">
         <label for="cardIconCenter">图标居中</label>
       </div>
-      <button class="btn btn-success" onclick="saveCardStyle()" style="width:100%">保存样式</button>
+      <button class="btn btn-success" onclick="saveCardStyle()" style="width:100%">💾 应用样式</button>
     </div>
   </div>
 
@@ -202,9 +301,9 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
         <input type="checkbox" id="notice_enabled">
         <label for="notice_enabled">启用公告</label>
       </div>
-      <input class="form-input" id="notice_title">
-      <textarea class="form-text" id="notice_text"></textarea>
-      <button class="btn btn-success" onclick="saveNotice()" style="width:100%">保存公告</button>
+      <input class="form-input" id="notice_title" placeholder="公告标题">
+      <textarea class="form-text" id="notice_text" placeholder="公告内容"></textarea>
+      <button class="btn btn-success" onclick="saveNotice()" style="width:100%">💾 保存公告</button>
     </div>
   </div>
 
@@ -214,12 +313,12 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
       <span class="collapse-arrow" id="arr_maintainCollapse">▶</span>
     </div>
     <div class="collapse-body" id="maintainCollapse">
-      <input class="form-input" id="set_title">
-      <textarea class="form-text" id="set_desc"></textarea>
+      <input class="form-input" id="set_title" placeholder="维护标题">
+      <textarea class="form-text" id="set_desc" placeholder="维护说明"></textarea>
       <div class="btn-group">
-        <button class="btn btn-success" onclick="saveSet()">保存</button>
-        <button class="btn btn-primary" onclick="openMt()">开启维护</button>
-        <button class="btn btn-danger" onclick="closeMt()">关闭维护</button>
+        <button class="btn btn-success" onclick="saveSet()">💾 保存</button>
+        <button class="btn btn-primary" onclick="openMt()">🔓 开启维护</button>
+        <button class="btn btn-danger" onclick="closeMt()">🔒 关闭维护</button>
       </div>
     </div>
   </div>
@@ -232,9 +331,10 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
     <div class="collapse-body" id="pwdCollapse">
       <input class="form-input" id="old_pwd" type="password" placeholder="原密码">
       <input class="form-input" id="new_pwd" type="password" placeholder="新密码">
-      <input class="form-input" id="confirm_pwd" type="password" placeholder="确认密码">
-      <button class="btn btn-primary" onclick="updatePassword()" style="width:100%">修改密码</button>
-      <button class="btn btn-warning" onclick="resetPassword()" style="width:100%;margin-top:8px;">重置为默认密码</button>
+      <input class="form-input" id="confirm_pwd" type="password" placeholder="确认新密码">
+      <button class="btn btn-primary" onclick="updatePassword()" style="width:100%">✅ 修改密码</button>
+      <div style="height:8px;"></div>
+      <button class="btn btn-warning" onclick="resetPassword()" style="width:100%">🔄 重置为默认密码</button>
     </div>
   </div>
 
@@ -246,8 +346,8 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
     <div class="collapse-body" id="categoryCollapse">
       <div id="categoryList"></div>
       <input class="form-input" id="add_category_name" placeholder="分类名称">
-      <input class="form-input" id="add_category_icon" placeholder="图标">
-      <button class="btn btn-success" onclick="addCategory()" style="width:100%">添加分类</button>
+      <input class="form-input" id="add_category_icon" placeholder="分类图标">
+      <button class="btn btn-success" onclick="addCategory()" style="width:100%">➕ 添加分类</button>
     </div>
   </div>
 
@@ -258,22 +358,22 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
     </div>
     <div class="collapse-body" id="lineCollapse">
       <div id="adminLineList"></div>
-      <input class="form-input" id="add_name" placeholder="名称">
-      <input class="form-input" id="add_url" placeholder="地址">
-      <input class="form-input" id="add_icon" placeholder="图标">
+      <input class="form-input" id="add_name" placeholder="导航名称">
+      <input class="form-input" id="add_url" placeholder="跳转地址">
+      <input class="form-input" id="add_icon" placeholder="导航图标">
       <select class="form-select" id="add_cid"></select>
-      <button class="btn btn-success" onclick="addLine()" style="width:100%">添加导航</button>
+      <button class="btn btn-success" onclick="addLine()" style="width:100%">➕ 添加导航</button>
     </div>
   </div>
 
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('copyrightCollapse')">
-      <span>ℹ️ 版权</span>
+      <span>ℹ️ 版权信息</span>
       <span class="collapse-arrow" id="arr_copyrightCollapse">▶</span>
     </div>
     <div class="collapse-body" id="copyrightCollapse">
-      <input class="form-input" id="copyright_text">
-      <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">保存</button>
+      <input class="form-input" id="copyright_text" placeholder="© 2026 闲时导航">
+      <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">💾 保存版权</button>
     </div>
   </div>
 
@@ -281,114 +381,431 @@ html,body{width:100%;min-height:100vh;background:#F7F8FA;display:flex;align-item
 </div>
 
 <script>
-function encodeHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function safeUrl(u){try{return new URL(u).protocol.startsWith('http')?u:'#';}catch{return '#';}}
-function setAdminLoggedIn(){localStorage.setItem('admin_logged','1');}
-function isAdminLoggedIn(){return localStorage.getItem('admin_logged')==='1';}
-const DEFAULT_PWD="668899";
-function getPwdHash(){return localStorage.getItem('pwd_hash')||md5(DEFAULT_PWD);}
-function setPwdHash(h){localStorage.setItem('pwd_hash',h);}
+// ==============================================
+// 已自动填入你的 Gist ID & GitHub Token
+// ==============================================
+const GIST_ID        = "29fbb5f067281c0e42cab753608122a1";
+const GITHUB_TOKEN   = "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";
+// 你的网络备份地址
+const NET_BACKUP_URL = "https://ru.xiaohe1999.dpdns.org/raw/nav-backup-1774766170141.txt";
 
-let cardStyle=localStorage.getItem('cardStyle')||'default';
-let cardIconCenter=localStorage.getItem('cardIconCenter')==='true';
-let maintainMode=localStorage.getItem('maintain')==='1';
-let mt_title=localStorage.getItem('mt_title')||'维护中';
-let mt_desc=localStorage.getItem('mt_desc')||'升级维护';
-let notice_enabled=localStorage.getItem('notice_enabled')!=='false';
-let notice_title=localStorage.getItem('notice_title')||'公告';
-let notice_text=localStorage.getItem('notice_text')||'欢迎使用';
-let copyright_text=localStorage.getItem('copyright_text')||'© 2026 闲时导航';
-let categories=JSON.parse(localStorage.getItem('cats'))||[{id:1,name:'默认',icon:'📁',hidden:false}];
-let lines=JSON.parse(localStorage.getItem('lines'))||[];
-let editIndex=-1;
-
-function saveAllToLocal(){
-  localStorage.setItem('cats',JSON.stringify(categories));
-  localStorage.setItem('lines',JSON.stringify(lines));
-  localStorage.setItem('cardStyle',cardStyle);
-  localStorage.setItem('cardIconCenter',cardIconCenter);
-  localStorage.setItem('maintain',maintainMode);
-  localStorage.setItem('mt_title',mt_title);
-  localStorage.setItem('mt_desc',mt_desc);
-  localStorage.setItem('notice_enabled',notice_enabled);
-  localStorage.setItem('notice_title',notice_title);
-  localStorage.setItem('notice_text',notice_text);
-  localStorage.setItem('copyright_text',copyright_text);
+function encodeHTML(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+function safeUrl(url) {
+  try { let u = new URL(url); return u.protocol.startsWith('http') ? url : '#'; } catch { return '#'; }
+}
+function nowStr() { return new Date().toLocaleString(); }
+
+function setAdminLoggedIn() { localStorage.setItem('admin_logged','1'); }
+function isAdminLoggedIn() { return localStorage.getItem('admin_logged')==='1'; }
+
+const DEFAULT_PWD = "668899";
+function getPwdHash() { return localStorage.getItem('pwd_hash') || md5(DEFAULT_PWD); }
+function setPwdHash(h) { localStorage.setItem('pwd_hash',h); }
+
+let cardStyle       = localStorage.getItem('cardStyle') || 'default';
+let cardIconCenter  = localStorage.getItem('cardIconCenter') === 'true';
+let maintainMode    = localStorage.getItem('maintain') === '1';
+let mt_title        = localStorage.getItem('mt_title') || '维护中';
+let mt_desc         = localStorage.getItem('mt_desc')  || '升级维护';
+let notice_enabled  = localStorage.getItem('notice_enabled') !== 'false';
+let notice_title    = localStorage.getItem('notice_title') || '公告';
+let notice_text     = localStorage.getItem('notice_text') || '欢迎使用';
+let copyright_text  = localStorage.getItem('copyright_text') || '© 2026 闲时导航';
+let categories      = JSON.parse(localStorage.getItem('cats')) || [{id:1,name:'默认',icon:'📁',hidden:false}];
+let lines           = JSON.parse(localStorage.getItem('lines')) || [];
+let editIndex       = -1;
 
 // ==============================================
-// 已强制替换：只从你指定地址拉取，不报错、不修改其他
+// 新增：网络备份一键恢复核心方法
 // ==============================================
-async function pullFromGist() {
-  if(!confirm('确定覆盖本地？')) return;
+async function restoreFromNetBackup() {
+  if(!confirm('确定从网络地址恢复备份？将覆盖本地所有数据！')) return;
   try {
-    let res = await fetch("https://ru.xiaohe1999.dpdns.org/raw/nav-backup-1774766170141.txt", {cache:"no-store"});
-    let txt = await res.text();
-    let d = JSON.parse(txt);
-
-    categories     = d.categories ?? categories;
-    lines          = d.lines ?? lines;
-    cardStyle      = d.cardStyle ?? cardStyle;
-    cardIconCenter = d.cardIconCenter ?? cardIconCenter;
-    maintainMode   = d.maintainMode ?? maintainMode;
-    mt_title       = d.mt_title ?? mt_title;
-    mt_desc        = d.mt_desc ?? mt_desc;
-    notice_enabled = d.notice_enabled ?? notice_enabled;
-    notice_title   = d.notice_title ?? notice_title;
-    notice_text    = d.notice_text ?? notice_text;
-    copyright_text = d.copyright_text ?? copyright_text;
-    if(d.pwd_hash) setPwdHash(d.pwd_hash);
-
-    saveAllToLocal();
+    const res = await fetch(NET_BACKUP_URL);
+    if(!res.ok) throw new Error('备份地址访问失败');
+    const data = await res.json();
+    unpackAll(data);
     renderAll();
-    alert("✅ 拉取并覆盖完成");
-  }catch(e){
-    alert("✅ 已强制拉取（即使提示异常也已覆盖）");
+    alert('✅ 网络备份恢复成功！本地数据已更新');
+  } catch (err) {
+    alert('❌ 恢复失败：' + err.message);
+    console.error('网络备份恢复失败：', err);
   }
 }
 
-async function pushToGist(){alert("上传功能保持原样，未改动");}
-function exportBackup(){
-  const blob=new Blob([JSON.stringify({categories,lines,cardStyle,cardIconCenter,maintainMode,mt_title,mt_desc,notice_enabled,notice_title,notice_text,copyright_text,pwd_hash:getPwdHash()},null,2)],{type:'text/plain'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nav-backup-'+Date.now()+'.txt';a.click();URL.revokeObjectURL(a.href);alert("✅ 已导出");
-}
-function importBackup(){
-  let f=document.getElementById('restoreFile').files[0];if(!f){alert("请选择文件");return;}
-  let r=new FileReader();r.onload=e=>{try{let d=JSON.parse(e.target.result);categories=d.categories??categories;lines=d.lines??lines;cardStyle=d.cardStyle??cardStyle;cardIconCenter=d.cardIconCenter??cardIconCenter;maintainMode=d.maintainMode??maintainMode;mt_title=d.mt_title??mt_title;mt_desc=d.mt_desc??mt_desc;notice_enabled=d.notice_enabled??notice_enabled;notice_title=d.notice_title??notice_title;notice_text=d.notice_text??notice_text;copyright_text=d.copyright_text??copyright_text;if(d.pwd_hash)setPwdHash(d.pwd_hash);saveAllToLocal();renderAll();alert("✅ 还原成功");location.reload();}catch{alert("格式错误");}};r.readAsText(f);
+// 新增：恢复网络备份并自动同步到Gist
+async function restoreFromNetBackupAndPush() {
+  if(!confirm('确定从网络恢复并同步到Gist？将覆盖本地和云端所有数据！')) return;
+  try {
+    const res = await fetch(NET_BACKUP_URL);
+    if(!res.ok) throw new Error('备份地址访问失败');
+    const data = await res.json();
+    unpackAll(data);
+    renderAll();
+    await setGistData(packAll());
+    alert('✅ 网络备份恢复成功！并已自动同步到Gist云端');
+  } catch (err) {
+    alert('❌ 操作失败：' + err.message);
+    console.error('恢复并同步失败：', err);
+  }
 }
 
-function renderAll(){renderCategoryAdmin();renderHome();renderAdminLine();refreshCatSelect();loadCopyright();}
-function loadCopyright(){let t=encodeHTML(copyright_text);document.getElementById('splash_copyright').innerText=t;document.getElementById('notice_copyright').innerText=t;document.getElementById('maintain_copyright').innerText=t;document.getElementById('login_copyright').innerText=t;document.getElementById('home_copyright').innerText=t;document.getElementById('admin_copyright').innerText=t;}
-function toggleCollapse(id){let b=document.getElementById(id);let a=document.getElementById('arr_'+id);b.classList.toggle('show');a.innerText=b.classList.contains('show')?'▼':'▶';}
-function show(id){['splash','notice','maintain','login','home','admin','editModal'].forEach(i=>document.getElementById(i).style.display='none');if(maintainMode&&!isAdminLoggedIn()){document.getElementById('maintain').style.display='flex';return;}if(['splash','notice','maintain','editModal'].includes(id))document.getElementById(id).style.display='flex';else document.getElementById(id).style.display='block';loadCopyright();}
-function showLogin(){document.getElementById('pwd').value='';document.getElementById('rememberPwd').checked=false;show('login');}
+// ==============================================
+// Gist 同步核心
+// ==============================================
+async function getGistData() {
+  let r = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    headers:{Authorization:`token ${GITHUB_TOKEN}`}
+  });
+  let d = await r.json();
+  return JSON.parse(d.files['data.json'].content);
+}
+
+async function setGistData(data) {
+  await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    method:'PATCH',
+    headers:{Authorization:`token ${GITHUB_TOKEN}`,'Content-Type':'application/json'},
+    body:JSON.stringify({
+      files:{
+        "data.json":{content:JSON.stringify(data,null,2)}
+      }
+    })
+  });
+}
+
+function packAll() {
+  return {
+    categories, lines, cardStyle, cardIconCenter,
+    maintainMode, mt_title, mt_desc,
+    notice_enabled, notice_title, notice_text,
+    copyright_text, pwd_hash:getPwdHash()
+  };
+}
+
+function unpackAll(data) {
+  categories     = data.categories || categories;
+  lines          = data.lines || lines;
+  cardStyle      = data.cardStyle ?? cardStyle;
+  cardIconCenter = data.cardIconCenter ?? cardIconCenter;
+  maintainMode   = data.maintainMode ?? maintainMode;
+  mt_title       = data.mt_title ?? mt_title;
+  mt_desc        = data.mt_desc ?? mt_desc;
+  notice_enabled = data.notice_enabled ?? notice_enabled;
+  notice_title   = data.notice_title ?? notice_title;
+  notice_text    = data.notice_text ?? notice_text;
+  copyright_text = data.copyright_text ?? copyright_text;
+  if(data.pwd_hash) setPwdHash(data.pwd_hash);
+  saveAllToLocal();
+}
+
+function saveAllToLocal() {
+  localStorage.setItem('cats', JSON.stringify(categories));
+  localStorage.setItem('lines', JSON.stringify(lines));
+  localStorage.setItem('cardStyle', cardStyle);
+  localStorage.setItem('cardIconCenter', cardIconCenter);
+  localStorage.setItem('maintain', maintainMode);
+  localStorage.setItem('mt_title', mt_title);
+  localStorage.setItem('mt_desc', mt_desc);
+  localStorage.setItem('notice_enabled', notice_enabled);
+  localStorage.setItem('notice_title', notice_title);
+  localStorage.setItem('notice_text', notice_text);
+  localStorage.setItem('copyright_text', copyright_text);
+}
+
+async function pushToGist() {
+  if(!confirm('确定上传到云端？将覆盖Gist中所有数据！')) return;
+  await setGistData(packAll());
+  alert('✅ 已成功上传到Gist云端');
+}
+
+async function pullFromGist() {
+  if(!confirm('确定从云端拉取？将覆盖本地所有数据！')) return;
+  try {
+    let data = await getGistData();
+    unpackAll(data);
+    renderAll();
+    alert('✅ 已成功从Gist拉取最新数据');
+  } catch (err) {
+    alert('❌ 拉取失败：云端暂无数据，请先上传或从网络恢复');
+    console.error('Gist拉取失败：', err);
+  }
+}
+
+// ==============================================
+// 本地备份 / 还原
+// ==============================================
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(packAll(),null,2)],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nav-backup-'+Date.now()+'.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  alert('✅ 本地备份已导出');
+}
+
+function importBackup() {
+  let f = document.getElementById('restoreFile').files[0];
+  if(!f) { alert('请先选择本地备份文件！'); return; }
+  let r = new FileReader();
+  r.onload = e=>{
+    try{
+      let d = JSON.parse(e.target.result);
+      unpackAll(d);
+      renderAll();
+      alert('✅ 本地备份还原成功');
+    }catch(e){alert('❌ 备份文件格式错误！')}
+  };
+  r.readAsText(f);
+}
+
+// ==============================================
+// 渲染相关
+// ==============================================
+function renderAll() {
+  renderCategoryAdmin(); renderHome(); renderAdminLine(); refreshCatSelect(); loadCopyright();
+}
+function loadCopyright() {
+  let t = encodeHTML(copyright_text);
+  document.getElementById('splash_copyright').innerText = t;
+  document.getElementById('notice_copyright').innerText = t;
+  document.getElementById('maintain_copyright').innerText = t;
+  document.getElementById('login_copyright').innerText = t;
+  document.getElementById('home_copyright').innerText = t;
+  document.getElementById('admin_copyright').innerText = t;
+}
+
+function toggleCollapse(id) {
+  let b = document.getElementById(id);
+  let a = document.getElementById('arr_'+id);
+  b.classList.toggle('show');
+  a.innerText = b.classList.contains('show') ? '▼' : '▶';
+}
+
+function show(id) {
+  ['splash','notice','maintain','login','home','admin','editModal'].forEach(i=>{
+    document.getElementById(i).style.display='none';
+  });
+  if(maintainMode && !isAdminLoggedIn()){
+    document.getElementById('maintain').style.display='flex'; return;
+  }
+  if(['splash','notice','maintain','editModal'].includes(id)){
+    document.getElementById(id).style.display='flex';
+  }else{
+    document.getElementById(id).style.display='block';
+  }
+  loadCopyright();
+}
+
+function showLogin() {
+  document.getElementById('pwd').value='';
+  document.getElementById('rememberPwd').checked=false;
+  show('login');
+}
+
 function closeNotice(){show('login');}
-function refreshCatSelect(){let a=document.getElementById('add_cid');let e=document.getElementById('edit_cid');a.innerHTML='';e.innerHTML='';categories.forEach(c=>{a.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;e.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;});}
-function renderCategoryAdmin(){let dom=document.getElementById('categoryList');dom.innerHTML='';categories.forEach((c,i)=>{let vis=c.hidden?'👁️显示':'🙈隐藏';dom.innerHTML+=`<div class="manager-line"><div class="name">${c.icon||''} ${c.name}</div><div><button class="btn-toggle" onclick="toggleCat(${i})">${vis}</button><button class="btn-del" onclick="delCat(${i})">删除</button></div></div>`;});}
-function toggleCat(i){categories[i].hidden=!categories[i].hidden;saveAllToLocal();renderAll();}
-function delCat(i){if(categories.length<=1)return alert('至少保留一个');if(!confirm('确定删除？'))return;let id=categories[i].id;categories.splice(i,1);lines.forEach(x=>{if(x.cid===id)x.cid=categories[0].id;});saveAllToLocal();renderAll();}
-function addCategory(){let n=document.getElementById('add_category_name').value.trim();let ic=document.getElementById('add_category_icon').value.trim()||'📁';if(!n)return alert('请输入名称');let mid=categories.length?Math.max(...categories.map(x=>x.id)):0;categories.push({id:mid+1,name:n,icon:ic,hidden:false});saveAllToLocal();document.getElementById('add_category_name').value='';document.getElementById('add_category_icon').value='';renderAll();alert('✅ 添加成功');}
-function renderHome(){let dom=document.getElementById('lineList');dom.innerHTML='';categories.filter(c=>!c.hidden).forEach(cat=>{let its=lines.filter(it=>it.cid===cat.id&&!it.hidden);if(its.length===0)return;dom.innerHTML+=`<div class="category-title">${cat.icon||''} ${cat.name}</div>`;its.forEach(it=>{let cls=`nav-card ${cardStyle} ${cardIconCenter?'center':''}`;dom.innerHTML+=`<div class="${cls}" onclick="window.open('${safeUrl(it.url)}','_blank')"><div class="nav-icon">${it.icon||'🔗'}</div><div class="nav-text">${encodeHTML(it.name)}</div></div>`;});});}
-function renderAdminLine(){let dom=document.getElementById('adminLineList');dom.innerHTML='';lines.forEach((it,i)=>{let c=categories.find(x=>x.id===it.cid);let vis=it.hidden?'🙈显示':'👁️隐藏';dom.innerHTML+=`<div class="manager-line"><div class="sort-btns"><button onclick="up(${i})">↑</button><button onclick="down(${i})">↓</button></div><div class="name">${it.icon||''} ${it.name} (${c?c.name:'-'})</div><div><button class="btn-toggle" onclick="toggleLine(${i})">${vis}</button><button class="btn-edit" onclick="openEdit(${i})">修改</button><button class="btn-del" onclick="delLine(${i})">删除</button></div></div>`;});}
+
+// ==============================================
+// 分类 & 导航管理
+// ==============================================
+function refreshCatSelect() {
+  let a = document.getElementById('add_cid');
+  let e = document.getElementById('edit_cid');
+  a.innerHTML=''; e.innerHTML='';
+  categories.forEach(c=>{
+    a.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+    e.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+  });
+}
+
+function renderCategoryAdmin() {
+  let dom = document.getElementById('categoryList'); dom.innerHTML='';
+  categories.forEach((c,i)=>{
+    let vis = c.hidden ? '👁️显示' : '🙈隐藏';
+    dom.innerHTML+=`
+    <div class="manager-line">
+      <div class="name">${c.icon||''} ${c.name}</div>
+      <div>
+        <button class="btn-toggle" onclick="toggleCat(${i})">${vis}</button>
+        <button class="btn-del" onclick="delCat(${i})">删除</button>
+      </div>
+    </div>`;
+  });
+}
+
+function toggleCat(i){
+  categories[i].hidden = !categories[i].hidden;
+  saveAllToLocal(); renderAll();
+}
+function delCat(i){
+  if(categories.length<=1)return alert('❌ 至少保留一个分类！');
+  if(!confirm('确定删除该分类？相关导航将移入默认分类！'))return;
+  let id = categories[i].id;
+  categories.splice(i,1);
+  lines.forEach(x=>{if(x.cid===id)x.cid=categories[0].id;});
+  saveAllToLocal(); renderAll();
+}
+function addCategory(){
+  let n = document.getElementById('add_category_name').value.trim();
+  let ic= document.getElementById('add_category_icon').value.trim()||'📁';
+  if(!n)return alert('❌ 请输入分类名称！');
+  let mid = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
+  categories.push({id:mid+1,name:n,icon:ic,hidden:false});
+  saveAllToLocal();
+  document.getElementById('add_category_name').value='';
+  document.getElementById('add_category_icon').value='';
+  renderAll(); alert('✅ 分类添加成功');
+}
+
+// ==============================================
+// 首页导航渲染
+// ==============================================
+function renderHome() {
+  let dom = document.getElementById('lineList'); dom.innerHTML='';
+  categories.filter(c=>!c.hidden).forEach(cat=>{
+    let its = lines.filter(it=>it.cid===cat.id && !it.hidden);
+    if(its.length===0)return;
+    dom.innerHTML+=`<div class="category-title">${cat.icon||''} ${cat.name}</div>`;
+    its.forEach(it=>{
+      let cls = `nav-card ${cardStyle} ${cardIconCenter?'center':''}`;
+      dom.innerHTML+=`
+        <div class="${cls}" onclick="window.open('${safeUrl(it.url)}','_blank')">
+          <div class="nav-icon">${it.icon||'🔗'}</div>
+          <div class="nav-text">${encodeHTML(it.name)}</div>
+        </div>`;
+    });
+  });
+}
+
+function renderAdminLine() {
+  let dom = document.getElementById('adminLineList'); dom.innerHTML='';
+  lines.forEach((it,i)=>{
+    let c = categories.find(x=>x.id===it.cid);
+    let vis = it.hidden ? '🙈显示' : '👁️隐藏';
+    dom.innerHTML+=`
+      <div class="manager-line">
+        <div class="sort-btns">
+          <button onclick="up(${i})">↑</button>
+          <button onclick="down(${i})">↓</button>
+        </div>
+        <div class="name">${it.icon||''} ${it.name} (${c?c.name:'默认分类'})</div>
+        <div>
+          <button class="btn-toggle" onclick="toggleLine(${i})">${vis}</button>
+          <button class="btn-edit" onclick="openEdit(${i})">修改</button>
+          <button class="btn-del" onclick="delLine(${i})">删除</button>
+        </div>
+      </div>`;
+  });
+}
+
 function up(i){if(i<=0)return;[lines[i-1],lines[i]]=[lines[i],lines[i-1]];saveAllToLocal();renderAll();}
 function down(i){if(i>=lines.length-1)return;[lines[i],lines[i+1]]=[lines[i+1],lines[i]];saveAllToLocal();renderAll();}
 function toggleLine(i){lines[i].hidden=!lines[i].hidden;saveAllToLocal();renderAll();}
-function delLine(i){if(!confirm('确定删除？'))return;lines.splice(i,1);saveAllToLocal();renderAll();}
-function addLine(){let n=document.getElementById('add_name').value.trim();let u=document.getElementById('add_url').value.trim();let ic=document.getElementById('add_icon').value.trim()||'🔗';let cid=+document.getElementById('add_cid').value;if(!n||!u)return alert('名称/地址不能为空');lines.push({name:n,url:u,icon:ic,cid,hidden:false});saveAllToLocal();document.getElementById('add_name').value='';document.getElementById('add_url').value='';document.getElementById('add_icon').value='';renderAll();alert('✅ 添加成功');}
-function openEdit(i){editIndex=i;let it=lines[i];document.getElementById('edit_name').value=it.name;document.getElementById('edit_url').value=it.url;document.getElementById('edit_icon').value=it.icon||'';document.getElementById('edit_cid').value=it.cid;document.getElementById('editModal').style.display='flex';}
+function delLine(i){if(!confirm('确定删除该导航？'))return;lines.splice(i,1);saveAllToLocal();renderAll();}
+function addLine(){
+  let n=document.getElementById('add_name').value.trim();
+  let u=document.getElementById('add_url').value.trim();
+  let ic=document.getElementById('add_icon').value.trim()||'🔗';
+  let cid=+document.getElementById('add_cid').value;
+  if(!n||!u)return alert('❌ 名称和跳转地址不能为空！');
+  lines.push({name:n,url:u,icon:ic,cid,hidden:false});
+  saveAllToLocal();
+  document.getElementById('add_name').value='';
+  document.getElementById('add_url').value='';
+  document.getElementById('add_icon').value='';
+  renderAll(); alert('✅ 导航添加成功');
+}
+function openEdit(i){editIndex=i;let it=lines[i];
+document.getElementById('edit_name').value=it.name;
+document.getElementById('edit_url').value=it.url;
+document.getElementById('edit_icon').value=it.icon||'';
+document.getElementById('edit_cid').value=it.cid;
+document.getElementById('editModal').style.display='flex';
+}
 function closeEdit(){document.getElementById('editModal').style.display='none';}
-function saveEdit(){let n=document.getElementById('edit_name').value.trim();let u=document.getElementById('edit_url').value.trim();let ic=document.getElementById('edit_icon').value.trim()||'🔗';let cid=+document.getElementById('edit_cid').value;if(!n||!u)return alert('不能为空');lines[editIndex]={...lines[editIndex],name:n,url:u,icon:ic,cid};saveAllToLocal();renderAll();closeEdit();alert('✅ 已保存');}
-function saveCardStyle(){cardStyle=document.getElementById('cardStyleSelect').value;cardIconCenter=document.getElementById('cardIconCenter').checked;localStorage.setItem('cardStyle',cardStyle);localStorage.setItem('cardIconCenter',cardIconCenter);renderHome();alert('🎨 已保存');}
-function saveNotice(){notice_enabled=document.getElementById('notice_enabled').checked;notice_title=document.getElementById('notice_title').value.trim();notice_text=document.getElementById('notice_text').value.trim();localStorage.setItem('notice_enabled',notice_enabled);localStorage.setItem('notice_title',notice_title);localStorage.setItem('notice_text',notice_text);alert('✅ 已保存');}
-function saveSet(){mt_title=document.getElementById('set_title').value;mt_desc=document.getElementById('set_desc').value;localStorage.setItem('mt_title',mt_title);localStorage.setItem('mt_desc',mt_desc);document.getElementById('mt_title').innerText=mt_title;document.getElementById('mt_desc').innerText=mt_desc;alert('✅ 已保存');}
-function saveCopyright(){copyright_text=document.getElementById('copyright_text').value.trim();localStorage.setItem('copyright_text',copyright_text);loadCopyright();alert('✅ 已保存');}
-function openMt(){localStorage.setItem('maintain','1');maintainMode=true;show('maintain');alert('🔒 已开启');}
-function closeMt(){localStorage.setItem('maintain','0');maintainMode=false;show('home');alert('🔓 已关闭');}
-function updatePassword(){let o=document.getElementById('old_pwd').value.trim();let n=document.getElementById('new_pwd').value.trim();let c=document.getElementById('confirm_pwd').value.trim();if(!o||!n||!c)return alert('请填写完整');if(n!==c)return alert('两次不一致');if(md5(o)!==getPwdHash())return alert('原密码错误');setPwdHash(md5(n));document.getElementById('old_pwd').value='';document.getElementById('new_pwd').value='';document.getElementById('confirm_pwd').value='';alert('✅ 已修改');}
-function resetPassword(){if(!confirm('重置为 668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 已重置');}
-document.getElementById('userLoginBtn').onclick=()=>{let v=document.getElementById('pwd').value.trim();if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('密码错误');};
-document.getElementById('adminLoginBtn').onclick=()=>{let v=document.getElementById('pwd').value.trim();if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('密码错误');};
+function saveEdit(){
+  let n=document.getElementById('edit_name').value.trim();
+  let u=document.getElementById('edit_url').value.trim();
+  let ic=document.getElementById('edit_icon').value.trim()||'🔗';
+  let cid=+document.getElementById('edit_cid').value;
+  if(!n||!u)return alert('❌ 名称和跳转地址不能为空！');
+  lines[editIndex]={...lines[editIndex],name:n,url:u,icon:ic,cid};
+  saveAllToLocal(); renderAll(); closeEdit(); alert('✅ 导航修改成功');
+}
 
+// ==============================================
+// 系统设置
+// ==============================================
+function saveCardStyle(){
+  cardStyle=document.getElementById('cardStyleSelect').value;
+  cardIconCenter=document.getElementById('cardIconCenter').checked;
+  localStorage.setItem('cardStyle',cardStyle);
+  localStorage.setItem('cardIconCenter',cardIconCenter);
+  renderHome(); alert('🎨 卡片样式设置已保存');
+}
+function saveNotice(){
+  notice_enabled=document.getElementById('notice_enabled').checked;
+  notice_title=document.getElementById('notice_title').value.trim();
+  notice_text=document.getElementById('notice_text').value.trim();
+  if(notice_enabled && (!notice_title||!notice_text))return alert('❌ 启用公告请填写标题和内容！');
+  localStorage.setItem('notice_enabled',notice_enabled);
+  localStorage.setItem('notice_title',notice_title);
+  localStorage.setItem('notice_text',notice_text);
+  alert('✅ 公告设置已保存');
+}
+function saveSet(){
+  mt_title=document.getElementById('set_title').value;
+  mt_desc=document.getElementById('set_desc').value;
+  localStorage.setItem('mt_title',mt_title);
+  localStorage.setItem('mt_desc',mt_desc);
+  document.getElementById('mt_title').innerText=mt_title;
+  document.getElementById('mt_desc').innerText=mt_desc;
+  alert('✅ 维护设置已保存');
+}
+function saveCopyright(){
+  copyright_text=document.getElementById('copyright_text').value.trim();
+  if(!copyright_text)return alert('❌ 请输入版权信息！');
+  localStorage.setItem('copyright_text',copyright_text);
+  loadCopyright(); alert('✅ 版权信息已保存');
+}
+function openMt(){localStorage.setItem('maintain','1');maintainMode=true;show('maintain');alert('🔒 已开启维护模式，仅管理员可访问');}
+function closeMt(){localStorage.setItem('maintain','0');maintainMode=false;show('home');alert('🔓 已关闭维护模式，所有人可正常访问');}
+
+function updatePassword(){
+  let o=document.getElementById('old_pwd').value.trim();
+  let n=document.getElementById('new_pwd').value.trim();
+  let c=document.getElementById('confirm_pwd').value.trim();
+  if(!o||!n||!c)return alert('❌ 请填写完整密码信息！');
+  if(n!==c)return alert('❌ 两次输入的新密码不一致！');
+  if(n.length<4)return alert('❌ 新密码至少4位！');
+  if(md5(o)!==getPwdHash())return alert('❌ 原密码输入错误！');
+  setPwdHash(md5(n));
+  document.getElementById('old_pwd').value='';
+  document.getElementById('new_pwd').value='';
+  document.getElementById('confirm_pwd').value='';
+  alert('✅ 密码修改成功，请重新登录');
+  clearAdminLoggedIn();
+  showLogin();
+}
+function resetPassword(){if(!confirm('确定将密码重置为默认密码 668899 吗？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 密码已重置为默认密码：668899');clearAdminLoggedIn();showLogin();}
+
+// ==============================================
+// 登录逻辑
+// ==============================================
+document.getElementById('userLoginBtn').onclick=()=>{
+  let v=document.getElementById('pwd').value.trim();
+  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('❌ 登录密码错误！');
+};
+document.getElementById('adminLoginBtn').onclick=()=>{
+  let v=document.getElementById('pwd').value.trim();
+  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('❌ 登录密码错误！');
+};
+
+// ==============================================
+// 系统初始化
+// ==============================================
 function init(){
   document.getElementById('mt_title').innerText=mt_title;
   document.getElementById('mt_desc').innerText=mt_desc;
@@ -402,7 +819,7 @@ function init(){
   setTimeout(()=>{
     if(maintainMode){show('maintain');}else{
       show(notice_enabled?'notice':'home');
-      if(notice_enabled) document.getElementById('notice_content').innerText=notice_text;
+      if(notice_enabled)document.getElementById('notice_content').innerText=notice_text;
     }
   },800);
 }

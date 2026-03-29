@@ -155,7 +155,7 @@ html, body {
 .login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:28px; color:var(--text-main); }
 .login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; background:#fff; }
 .remember-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; font-size:14px; color:var(--text-normal); }
-.btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+.btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
 .btn-primary { background:var(--primary); color:#fff; }
 .btn-primary:hover { background:#0E42D2; }
 
@@ -229,7 +229,7 @@ html, body {
 <div id="notice">
   <div class="notice-box">
     <div class="notice-title">📢 系统公告</div>
-    <div class="notice-content" id="notice_content"></div>
+    <div class="notice_content" id="notice_content"></div>
     <button class="notice-btn" onclick="closeNotice()">我已知晓</button>
     <div class="notice-footer" id="notice_copyright"></div>
   </div>
@@ -286,7 +286,6 @@ html, body {
     <div class="back-btn" onclick="showLogin()">返回</div>
   </div>
 
-  <!-- ====================== 数据备份与还原 ====================== -->
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
       <span>💾 数据备份与还原</span>
@@ -306,7 +305,6 @@ html, body {
     </div>
   </div>
 
-  <!-- 分类图标批量更换 -->
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('batchIconCollapse')">
       <span>🪄 分类图标批量更换</span>
@@ -434,7 +432,7 @@ html, body {
       <span class="collapse-arrow" id="arr_copyrightCollapse">▶</span>
     </div>
     <div class="collapse-body" id="copyrightCollapse">
-      <input class="form-input" id="copyright_text" placeholder="© 2025 闲时导航 版权所有">
+      <input class="form-input" id="copyright_text" placeholder="© 2026 闲时导航 版权所有">
       <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">💾 保存版权</button>
     </div>
   </div>
@@ -453,74 +451,96 @@ function encodeHTML(s) {
 function safeUrl(url) {
   try { let u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:' ? url : '#'; } catch { return '#'; }
 }
-function getIP() { return '本地'; }
+function getIP() { return '服务器'; }
 function nowStr() { let d = new Date(); return d.toLocaleString(); }
 
-// 管理员登录标识
 function setAdminLoggedIn() { localStorage.setItem('admin_logged', '1'); }
 function isAdminLoggedIn() { return localStorage.getItem('admin_logged') === '1'; }
 function clearAdminLoggedIn() { localStorage.removeItem('admin_logged'); }
 
 const DEFAULT_PWD = "668899";
-function getAdminPwdHash() { return localStorage.getItem('admin_pwd_hash') || md5(DEFAULT_PWD); }
-function setAdminPwdHash(hash) { localStorage.setItem('admin_pwd_hash', hash); }
+let admin_pwd_hash = "";
 
-let cardStyle = localStorage.getItem('cardStyle') || 'default';
-let cardIconCenter = localStorage.getItem('cardIconCenter') === 'true';
+let cardStyle = 'default';
+let cardIconCenter = false;
 
-let maintainMode = localStorage.getItem('maintain') === '1';
-let mt_title = localStorage.getItem('mt_title') || '系统维护中';
-let mt_desc  = localStorage.getItem('mt_desc')  || '为提供更稳定的服务，系统正在升级维护。';
+let maintainMode = false;
+let mt_title = '';
+let mt_desc  = '';
 
-let notice_enabled = localStorage.getItem('notice_enabled') !== 'false';
-let notice_title   = localStorage.getItem('notice_title') || '📢 系统公告';
-let notice_text    = localStorage.getItem('notice_text') || '欢迎使用闲时导航';
+let notice_enabled = true;
+let notice_title   = '';
+let notice_text    = '';
 
-let copyright_text = localStorage.getItem('copyright_text') || '© 2025 闲时导航 版权所有';
+let copyright_text = '';
 
-let categories = JSON.parse(localStorage.getItem('categories')) || [
-  { id: 1, name: '默认分类', icon: '📁', hidden: false }
-];
-let lines = JSON.parse(localStorage.getItem('lines')) || [];
+let categories = [];
+let lines = [];
 let editIndex = -1;
 const REMEMBER_KEY = "remember_user_pwd";
 
-// ====================== 数据备份 / 还原 ======================
+let allData = {};
+
+async function loadFromServer() {
+  try {
+    let res = await fetch('api.php?action=get');
+    allData = await res.json();
+
+    categories      = allData.categories;
+    lines           = allData.lines;
+    notice_enabled  = allData.notice_enabled;
+    notice_title    = allData.notice_title;
+    notice_text     = allData.notice_text;
+    copyright_text  = allData.copyright_text;
+    cardStyle       = allData.cardStyle;
+    cardIconCenter  = allData.cardIconCenter;
+    maintainMode    = allData.maintainMode;
+    mt_title        = allData.mt_title;
+    mt_desc         = allData.mt_desc;
+    admin_pwd_hash  = allData.admin_pwd_hash;
+  } catch(e) {
+    alert('加载数据失败：' + e.message);
+  }
+}
+
+async function saveToServer() {
+  try {
+    let post = {
+      categories, lines,
+      notice_enabled, notice_title, notice_text,
+      copyright_text, cardStyle, cardIconCenter,
+      maintainMode, mt_title, mt_desc,
+      admin_pwd_hash
+    };
+    await fetch('api.php?action=save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+  } catch(e) {
+    alert('保存失败：' + e.message);
+  }
+}
+
 function exportBackup() {
-  const data = {
-    categories,
-    lines,
-    notice_enabled,
-    notice_title,
-    notice_text,
-    copyright_text,
-    cardStyle,
-    cardIconCenter,
-    maintainMode,
-    mt_title,
-    mt_desc,
-    admin_pwd_hash: getAdminPwdHash()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' });
+  const data = {...allData, categories, lines, admin_pwd_hash};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'text/plain'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = '导航备份_' + '1900-01-01_00-00-00' + '.txt';
+  a.download = '导航备份_'+new Date().getTime()+'.txt';
   a.click();
   URL.revokeObjectURL(url);
-  alert('✅ 数据备份已导出');
+  alert('✅ 备份已导出');
 }
 
-function importBackup() {
+async function importBackup() {
   const input = document.getElementById('restoreFile');
-  if (!input.files || !input.files[0]) {
-    alert('请先选择备份文件');
-    return;
-  }
-  if (!confirm('⚠️ 还原将覆盖全部现有数据，确定继续？')) return;
+  if (!input.files?.[0]) { alert('请选择文件'); return; }
+  if (!confirm('还原会覆盖全部数据，确定？')) return;
 
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const data = JSON.parse(e.target.result);
       categories = data.categories || categories;
@@ -534,60 +554,45 @@ function importBackup() {
       maintainMode = data.maintainMode ?? maintainMode;
       mt_title = data.mt_title ?? mt_title;
       mt_desc = data.mt_desc ?? mt_desc;
-      if (data.admin_pwd_hash) setAdminPwdHash(data.admin_pwd_hash);
+      if (data.admin_pwd_hash) admin_pwd_hash = data.admin_pwd_hash;
 
-      localStorage.setItem('categories', JSON.stringify(categories));
-      localStorage.setItem('lines', JSON.stringify(lines));
-      localStorage.setItem('notice_enabled', notice_enabled);
-      localStorage.setItem('notice_title', notice_title);
-      localStorage.setItem('notice_text', notice_text);
-      localStorage.setItem('copyright_text', copyright_text);
-      localStorage.setItem('cardStyle', cardStyle);
-      localStorage.setItem('cardIconCenter', cardIconCenter);
-      localStorage.setItem('maintain', maintainMode);
-      localStorage.setItem('mt_title', mt_title);
-      localStorage.setItem('mt_desc', mt_desc);
-
+      await saveToServer();
       renderCategoryAdmin();
       refreshCatSelect();
       renderHome();
       renderAdminLine();
-      alert('✅ 数据还原成功，页面已刷新');
+      alert('✅ 还原成功');
       location.reload();
     } catch (err) {
-      alert('❌ 备份文件格式错误');
+      alert('文件格式错误');
     }
   };
   reader.readAsText(input.files[0]);
 }
 
-// ====================== 分类显示/隐藏 ======================
 function toggleCategoryVisible(index) {
   categories[index].hidden = !categories[index].hidden;
-  localStorage.setItem('categories', JSON.stringify(categories));
-  renderCategoryAdmin();
-  renderHome();
-}
-
-// ====================== 分类图标批量更换 ======================
-function batchUpdateCategoryIcon() {
-  let ico = document.getElementById('batchCategoryIcon').value.trim();
-  if (!ico) { alert('请输入要批量设置的图标！'); return; }
-  if (!confirm('确定要把【所有分类】图标统一换成：' + ico + ' 吗？')) return;
-  categories.forEach(c => c.icon = ico);
-  localStorage.setItem('categories', JSON.stringify(categories));
+  saveToServer();
   renderCategoryAdmin(); renderHome();
-  alert('✅ 所有分类图标已批量更换完成！');
 }
 
-// ====================== 登录日志 ======================
+async function batchUpdateCategoryIcon() {
+  let ico = document.getElementById('batchCategoryIcon').value.trim();
+  if (!ico) { alert('请输入图标'); return; }
+  if (!confirm('确定全部替换？')) return;
+  categories.forEach(c => c.icon = ico);
+  await saveToServer();
+  renderCategoryAdmin(); renderHome();
+  alert('✅ 批量完成');
+}
+
 function getAdminLog() {
   return JSON.parse(localStorage.getItem('admin_login_log') || '[]');
 }
 function addAdminLog(success) {
   let log = getAdminLog();
-  log.unshift({ time: nowStr(), ip: getIP(), success });
-  if (log.length > 100) log = log.slice(0, 100);
+  log.unshift({time:nowStr(), ip:getIP(), success});
+  if (log.length>100) log = log.slice(0,100);
   localStorage.setItem('admin_login_log', JSON.stringify(log));
 }
 function renderAdminLog() {
@@ -597,20 +602,18 @@ function renderAdminLog() {
   log.forEach(item => {
     let cls = item.success ? 'log-success' : 'log-fail';
     let txt = item.success ? '登录成功' : '登录失败';
-    dom.innerHTML += `<div class="log-item"><span class="log-time">${item.time}</span>｜<span class="log-ip">IP: ${item.ip}</span>｜<span class="${cls}">${txt}</span></div>`;
+    dom.innerHTML += `<div class="log-item"><span class="log-time">${item.time}</span>｜IP: ${item.ip}｜<span class="${cls}">${txt}</span></div>`;
   });
 }
 function clearAdminLog() {
-  if (!confirm('确定清空所有登录日志？')) return;
+  if (!confirm('确定清空？')) return;
   localStorage.removeItem('admin_login_log');
   renderAdminLog();
-  alert('✅ 日志已清空');
 }
 
-// ====================== 导航显示/隐藏 ======================
 function toggleLineVisible(index) {
   lines[index].hidden = !lines[index].hidden;
-  localStorage.setItem('lines', JSON.stringify(lines));
+  saveToServer();
   renderAdminLine(); renderHome();
 }
 
@@ -621,7 +624,6 @@ function toggleCollapse(id) {
   arr.innerText = body.classList.contains('show') ? '▼' : '▶';
 }
 
-// ====================== 维护仅管理员可见 ======================
 function show(id) {
   ['splash','notice','maintain','login','home','admin','editModal'].forEach(i => {
     document.getElementById(i).style.display = 'none';
@@ -649,41 +651,49 @@ function loadAllCopyright() {
   document.getElementById('admin_copyright').innerText = txt;
 }
 
-function saveCardStyle() {
+async function saveCardStyle() {
   cardStyle = document.getElementById('cardStyleSelect').value;
   cardIconCenter = document.getElementById('cardIconCenter').checked;
-  localStorage.setItem('cardStyle', cardStyle);
-  localStorage.setItem('cardIconCenter', cardIconCenter);
+  await saveToServer();
   renderHome();
-  alert("🎨 卡片样式已应用");
+  alert("🎨 样式已保存");
 }
 
-function moveUp(index) { if(index<=0) return; [lines[index-1], lines[index]] = [lines[index], lines[index-1]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
-function moveDown(index) { if(index>=lines.length-1) return; [lines[index], lines[index+1]] = [lines[index+1], lines[index]]; localStorage.setItem('lines', JSON.stringify(lines)); renderAdminLine(); renderHome(); }
+function moveUp(index) {
+  if(index<=0) return;
+  [lines[index-1], lines[index]] = [lines[index], lines[index-1]];
+  saveToServer();
+  renderAdminLine(); renderHome();
+}
+function moveDown(index) {
+  if(index>=lines.length-1) return;
+  [lines[index], lines[index+1]] = [lines[index+1], lines[index]];
+  saveToServer();
+  renderAdminLine(); renderHome();
+}
 
-function updatePassword() {
+async function updatePassword() {
   let oldPwd = document.getElementById('old_pwd').value.trim();
   let newPwd = document.getElementById('new_pwd').value.trim();
   let confirmPwd = document.getElementById('confirm_pwd').value.trim();
   if(!oldPwd || !newPwd || !confirmPwd) { alert("请填写完整"); return; }
-  if(newPwd !== confirmPwd) { alert("两次新密码不一致"); return; }
-  if(newPwd.length < 4) { alert("密码至少4位"); return; }
-  if(md5(oldPwd) !== getAdminPwdHash()) { alert("原密码不正确"); return; }
-  setAdminPwdHash(md5(newPwd));
-  document.getElementById('old_pwd').value = "";
-  document.getElementById('new_pwd').value = "";
-  document.getElementById('confirm_pwd').value = "";
-  alert("✅ 密码修改成功");
-}
-function resetPassword() {
-  if(!confirm("确定要重置为默认密码？\n默认密码："+DEFAULT_PWD)) return;
-  setAdminPwdHash(md5(DEFAULT_PWD));
-  alert("🔄 已重置为默认密码：\n"+DEFAULT_PWD);
+  if(newPwd !== confirmPwd) { alert("两次不一致"); return; }
+  if(md5(oldPwd) !== admin_pwd_hash) { alert("原密码错误"); return; }
+  admin_pwd_hash = md5(newPwd);
+  await saveToServer();
+  document.getElementById('old_pwd').value='';
+  document.getElementById('new_pwd').value='';
+  document.getElementById('confirm_pwd').value='';
+  alert("✅ 密码已修改");
 }
 
-function saveCategories() { localStorage.setItem('categories', JSON.stringify(categories)); }
+async function resetPassword() {
+  if(!confirm("重置为默认？")) return;
+  admin_pwd_hash = md5(DEFAULT_PWD);
+  await saveToServer();
+  alert("🔄 已重置为：668899");
+}
 
-// 分类列表
 function renderCategoryAdmin() {
   let dom = document.getElementById('categoryList'); dom.innerHTML = '';
   categories.forEach((c,i)=>{
@@ -701,26 +711,26 @@ function renderCategoryAdmin() {
   });
 }
 
-function addCategory() {
+async function addCategory() {
   let name = document.getElementById('add_category_name').value.trim();
   let icon = document.getElementById('add_category_icon').value.trim() || '📁';
-  if(!name) { alert("请输入分类名称"); return; }
+  if(!name) { alert("请输入名称"); return; }
   let maxId = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
-  categories.push({id:maxId+1, name, icon, hidden: false});
-  saveCategories();
-  document.getElementById('add_category_name').value = '';
-  document.getElementById('add_category_icon').value = '';
-  renderCategoryAdmin(); refreshCatSelect(); alert("✅ 分类添加成功");
+  categories.push({id:maxId+1, name, icon, hidden:false});
+  await saveToServer();
+  document.getElementById('add_category_name').value='';
+  document.getElementById('add_category_icon').value='';
+  renderCategoryAdmin(); refreshCatSelect(); alert("✅ 添加成功");
 }
 
-function delCategory(index) {
-  if(categories.length <=1) { alert("至少保留一个分类"); return; }
-  if(!confirm("确定删除？相关导航将移入默认分类")) return;
+async function delCategory(index) {
+  if(categories.length <=1) { alert("至少保留一个"); return; }
+  if(!confirm("确定删除？")) return;
   let delId = categories[index].id;
   categories.splice(index,1);
   lines.forEach(it=>{ if(it.cid===delId) it.cid = categories[0].id; });
-  saveCategories(); localStorage.setItem('lines', JSON.stringify(lines));
-  renderCategoryAdmin(); refreshCatSelect(); renderAdminLine(); renderHome(); alert("🗑️ 分类已删除");
+  await saveToServer();
+  renderCategoryAdmin(); refreshCatSelect(); renderAdminLine(); renderHome(); alert("🗑️ 已删除");
 }
 
 function refreshCatSelect() {
@@ -733,7 +743,6 @@ function refreshCatSelect() {
   });
 }
 
-// 首页只显示未隐藏分类
 function renderHome() {
   let dom = document.getElementById('lineList'); dom.innerHTML = '';
   categories.filter(c => !c.hidden).forEach(cat=>{
@@ -780,19 +789,20 @@ function renderAdminLine() {
   });
 }
 
-function addLine() {
+async function addLine() {
   let n = document.getElementById('add_name').value.trim();
   let u = document.getElementById('add_url').value.trim();
   let ic= document.getElementById('add_icon').value.trim() || '🔗';
   let cid= parseInt(document.getElementById('add_cid').value);
   if(!n || !u) { alert("名称和地址不能为空"); return; }
   lines.push({name:n, url:u, icon:ic, cid, hidden:false});
-  localStorage.setItem('lines', JSON.stringify(lines));
-  document.getElementById('add_name').value = '';
-  document.getElementById('add_url').value = '';
-  document.getElementById('add_icon').value = '';
-  renderAdminLine(); renderHome(); alert("✅ 添加导航成功");
+  await saveToServer();
+  document.getElementById('add_name').value='';
+  document.getElementById('add_url').value='';
+  document.getElementById('add_icon').value='';
+  renderAdminLine(); renderHome(); alert("✅ 添加成功");
 }
+
 function openEdit(i) {
   if(i<0||i>=lines.length) return;
   editIndex = i;
@@ -804,99 +814,109 @@ function openEdit(i) {
   document.getElementById('editModal').style.display = 'flex';
 }
 function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
-function saveEdit() {
+
+async function saveEdit() {
   let n = document.getElementById('edit_name').value.trim();
   let u = document.getElementById('edit_url').value.trim();
   let ic= document.getElementById('edit_icon').value.trim() || '🔗';
   let cid= parseInt(document.getElementById('edit_cid').value);
   if(!n || !u) { alert("不能为空"); return; }
   lines[editIndex] = {...lines[editIndex], name:n, url:u, icon:ic, cid};
-  localStorage.setItem('lines', JSON.stringify(lines));
+  await saveToServer();
   renderAdminLine(); renderHome(); closeEdit(); alert("✅ 修改成功");
 }
-function delLine(i) {
-  if(!confirm("确定删除该导航？")) return;
+
+async function delLine(i) {
+  if(!confirm("确定删除？")) return;
   lines.splice(i,1);
-  localStorage.setItem('lines', JSON.stringify(lines));
-  renderAdminLine(); renderHome(); alert("🗑️ 删除成功");
+  await saveToServer();
+  renderAdminLine(); renderHome(); alert("🗑️ 已删除");
 }
 
 function closeNotice() { show('login'); }
-function saveCopyright() {
+
+async function saveCopyright() {
   let txt = document.getElementById('copyright_text').value.trim();
-  if(!txt) { alert("请输入版权信息"); return; }
-  localStorage.setItem('copyright_text', txt);
+  if(!txt) { alert("请输入内容"); return; }
   copyright_text = txt;
-  loadAllCopyright(); alert("✅ 版权已保存");
+  await saveToServer();
+  loadAllCopyright(); alert("✅ 已保存");
 }
-function saveNotice() {
+
+async function saveNotice() {
   let en = document.getElementById('notice_enabled').checked;
   let t = document.getElementById('notice_title').value.trim();
   let c = document.getElementById('notice_text').value.trim();
   if(!t || !c) { alert("标题和内容不能为空"); return; }
-  localStorage.setItem('notice_enabled', en);
-  localStorage.setItem('notice_title', t);
-  localStorage.setItem('notice_text', c);
   notice_enabled = en; notice_title = t; notice_text = c;
+  await saveToServer();
   alert("✅ 公告已保存");
 }
-function saveSet() {
-  localStorage.setItem('mt_title', document.getElementById('set_title').value);
-  localStorage.setItem('mt_desc',  document.getElementById('set_desc').value);
+
+async function saveSet() {
   mt_title = document.getElementById('set_title').value;
   mt_desc  = document.getElementById('set_desc').value;
+  await saveToServer();
   document.getElementById('mt_title').innerText = encodeHTML(mt_title);
   document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
-  alert("✅ 维护信息已保存");
+  alert("✅ 已保存");
 }
 
-function openMt() {
-  localStorage.setItem('maintain','1');
+async function openMt() {
   maintainMode = true;
+  await saveToServer();
   show('maintain');
-  alert("🔒 已开启维护模式（仅管理员可访问）");
+  alert("🔒 已开启维护");
 }
-
-function closeMt() {
-  localStorage.setItem('maintain','0');
+async function closeMt() {
   maintainMode = false;
+  await saveToServer();
   show('home');
-  alert("🔓 已关闭维护，所有人可正常访问");
+  alert("🔓 已关闭维护");
 }
 
-function loadRememberedPwd() {
-  if(localStorage.getItem(REMEMBER_KEY)==="true") {
-    document.getElementById('pwd').value = DEFAULT_PWD;
-    document.getElementById('rememberPwd').checked = true;
-  }
-}
 function showLogin() {
   document.getElementById('pwd').value = '';
   document.getElementById('rememberPwd').checked = false;
-  loadRememberedPwd();
   show('login');
 }
 
-document.getElementById('userLoginBtn').onclick = ()=>{
-  let inputPwd = document.getElementById('pwd').value.trim();
-  let ok = md5(inputPwd) === getAdminPwdHash();
+// 修复：登录按钮绑定 & 密码验证
+document.getElementById('userLoginBtn').addEventListener('click', async () => {
+  const inputPwd = document.getElementById('pwd').value.trim();
+  if (!admin_pwd_hash) {
+    alert('未加载到密码配置，请刷新页面重试');
+    return;
+  }
+  const ok = md5(inputPwd) === admin_pwd_hash;
   addAdminLog(ok);
-  if(!ok) { alert("密码错误"); return; }
+  if (!ok) {
+    alert('密码错误');
+    return;
+  }
   setAdminLoggedIn();
-  localStorage.setItem(REMEMBER_KEY, document.getElementById('rememberPwd').checked ? "true" : "false");
   show('home');
-};
+});
 
-document.getElementById('adminLoginBtn').onclick = ()=>{
-  let inputPwd = document.getElementById('pwd').value.trim();
-  let ok = md5(inputPwd) === getAdminPwdHash();
+document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+  const inputPwd = document.getElementById('pwd').value.trim();
+  if (!admin_pwd_hash) {
+    alert('未加载到密码配置，请刷新页面重试');
+    return;
+  }
+  const ok = md5(inputPwd) === admin_pwd_hash;
   addAdminLog(ok);
-  if(!ok) { alert("密码错误"); return; }
+  if (!ok) {
+    alert('密码错误');
+    return;
+  }
   setAdminLoggedIn();
   show('admin');
-};
+});
 
-function init() {
+async function init() {
+  await loadFromServer();
+
   document.getElementById('mt_title').innerText = encodeHTML(mt_title);
   document.getElementById('mt_desc').innerText = encodeHTML(mt_desc);
   document.getElementById('notice_enabled').checked = notice_enabled;
@@ -906,20 +926,24 @@ function init() {
   document.getElementById('cardStyleSelect').value = cardStyle;
   document.getElementById('cardIconCenter').checked = cardIconCenter;
 
-  renderCategoryAdmin(); refreshCatSelect(); renderHome(); renderAdminLine();
-  loadRememberedPwd(); loadAllCopyright();
+  renderCategoryAdmin();
+  refreshCatSelect();
+  renderHome();
+  renderAdminLine();
+  loadAllCopyright();
 
   setTimeout(()=>{
     if (maintainMode) {
       show('maintain');
     } else {
       show(notice_enabled ? 'notice' : 'home');
+      if (notice_enabled) {
+        document.getElementById('notice_content').innerText = notice_text;
+      }
     }
-    if (!maintainMode && notice_enabled) {
-      document.getElementById('notice_content').innerText = notice_text;
-    }
-  },900);
+  }, 900);
 }
+
 init();
 </script>
 </body>

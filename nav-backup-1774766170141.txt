@@ -46,6 +46,13 @@
       "icon": "🔗",
       "cid": 2,
       "hidden": false
+    },
+    {
+      "name": "xvideos",
+      "url": "https://www.xvideos.com",
+      "icon": "🔗",
+      "cid": 4,
+      "hidden": false
     }
   ],
   "cardStyle": "default",

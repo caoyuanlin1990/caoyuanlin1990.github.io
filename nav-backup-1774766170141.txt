@@ -23,6 +23,12 @@
       "name": "福利",
       "icon": "📁",
       "hidden": false
+    },
+    {
+      "id": 5,
+      "name": "测试",
+      "icon": "📁",
+      "hidden": false
     }
   ],
   "lines": [
@@ -53,10 +59,17 @@
       "icon": "🔗",
       "cid": 4,
       "hidden": false
+    },
+    {
+      "name": "百度",
+      "url": "http://www.baidu.com",
+      "icon": "🔗",
+      "cid": 5,
+      "hidden": false
     }
   ],
-  "cardStyle": "default",
-  "cardIconCenter": false,
+  "cardStyle": "square",
+  "cardIconCenter": true,
   "maintainMode": false,
   "mt_title": "维护中",
   "mt_desc": "升级维护",

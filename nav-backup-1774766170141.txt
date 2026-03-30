@@ -74,6 +74,13 @@
       "icon": "🔗",
       "cid": 3,
       "hidden": false
+    },
+    {
+      "name": "Airport Aggregator Web Edition • Antigravity",
+      "url": "https://hk.liukun.com",
+      "icon": "🔗",
+      "cid": 3,
+      "hidden": false
     }
   ],
   "cardStyle": "square",

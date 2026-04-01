@@ -74,6 +74,13 @@
       "icon": "🔗",
       "cid": 3,
       "hidden": false
+    },
+    {
+      "name": "APP下载",
+      "url": "https://ru.xiaohe1999.dpdns.org/raw/%E9%97%B2%E6%97%B6%E5%AF%BC%E8%88%AA_1.0_20260401_200404.apk",
+      "icon": "🔗",
+      "cid": 3,
+      "hidden": false
     }
   ],
   "cardStyle": "flat",

@@ -453,20 +453,39 @@ function saveAllToLocal() {
 
 // 核心：自动从GitHub读取配置
 async function autoLoadConfigFromGithub() {
-  try {
-    const response = await fetch(CONFIG_GITHUB_URL);
-    if(!response.ok) throw new Error('配置文件拉取失败');
-    const configData = await response.text();
-    const data = JSON.parse(configData);
-    unpackAll(data);
-    renderAll();
-  } catch (e) {
-    console.log('自动加载配置失败，使用本地缓存：', e.message);
-  } finally {
-    // 加载完成后跳转到对应页面
-    initPageShow();
+  let syncOk = false;
+  for (let url of CONFIG_URL_LIST) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(url, {
+        signal: controller.signal,
+        cache: "no-cache"
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error("请求异常");
+      const txt = await res.text();
+      const data = JSON.parse(txt);
+      
+      unpackAll(data);
+      console.log("✅ 成功同步当前线路：", url);
+      syncOk = true;
+      break;
+    } catch (e) {
+      console.log("❌ 当前线路失败，自动切换下一条：", url);
+      continue;
+    }
   }
+
+  if (!syncOk) {
+    console.log("⚠️ 三条云端线路全部失效，启用本地旧配置兜底");
+  }
+
+  renderAll();
+  initPageShow();
 }
+
 
 // 手动从GitHub同步配置
 async function restoreFromGithubUrl() {

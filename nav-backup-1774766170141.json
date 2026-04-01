@@ -55,8 +55,8 @@
       "hidden": false
     },
     {
-      "name": "91porn",
-      "url": "https://46a0.ogzxnem.cc/",
+      "name": "羞羞视频",
+      "url": "https://8.x370x.cc/",
       "icon": "🔗",
       "cid": 4,
       "hidden": false
@@ -74,13 +74,6 @@
       "icon": "🔗",
       "cid": 3,
       "hidden": false
-    },
-    {
-      "name": "APP下载",
-      "url": "https://ru.xiaohe1999.dpdns.org/raw/%E9%97%B2%E6%97%B6%E5%AF%BC%E8%88%AA_1.0_20260401_200404.apk",
-      "icon": "🔗",
-      "cid": 3,
-      "hidden": false
     }
   ],
   "cardStyle": "flat",
@@ -93,5 +86,9 @@
   "notice_text": "欢迎使用",
   "copyright_text": "© 2026 闲时导航",
   "pwd_hash": "c3d469023086a1778d872be41ac64239",
-  "collapseState": {}
+  "collapseState": {
+    "categoryCollapse": true,
+    "lineCollapse": true,
+    "backupCollapse": true
+  }
 }

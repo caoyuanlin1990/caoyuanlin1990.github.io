@@ -48,7 +48,7 @@
       "hidden": false
     },
     {
-      "name": "xvideos(国内无法打开)",
+      "name": "xvideos",
       "url": "https://www.xvideos.com",
       "icon": "🔗",
       "cid": 4,
@@ -74,21 +74,14 @@
       "icon": "🔗",
       "cid": 3,
       "hidden": false
-    },
-    {
-      "name": "Airport Aggregator Web Edition • Antigravity",
-      "url": "https://hk.liukun.com",
-      "icon": "🔗",
-      "cid": 3,
-      "hidden": false
     }
   ],
-  "cardStyle": "square",
+  "cardStyle": "flat",
   "cardIconCenter": true,
   "maintainMode": false,
   "mt_title": "维护中",
   "mt_desc": "升级维护",
-  "notice_enabled": false,
+  "notice_enabled": true,
   "notice_title": "公告",
   "notice_text": "欢迎使用",
   "copyright_text": "© 2026 闲时导航",

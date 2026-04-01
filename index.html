@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>闲时导航 - 智能极速启动</title>
+<title>闲时导航 - 自动加载配置</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/1.0.1/js/md5.min.js"></script>
 <style>
 * {
@@ -20,6 +20,11 @@ html,body {
   align-items:center;
   justify-content:center;
   padding:12px;
+  /* 移动端软键盘适配 */
+  min-height: -webkit-fill-available;
+}
+body {
+  height: -webkit-fill-available;
 }
 :root {
   --primary:#165DFF; --success:#00B42A; --danger:#F53F3F;
@@ -27,11 +32,43 @@ html,body {
   --card-bg:#fff; --border:#E5E6EB; --radius:16px;
   --shadow:0 2px 12px rgba(0,0,0,0.06);
   --text-main:#1D2129; --text-normal:#4E5969;
+  --loading:rgb(22, 93, 255, 0.2);
+}
+/* 按钮禁用样式 */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--light) !important;
+  color: var(--neutral) !important;
+}
+/* 加载状态样式 */
+.loading {
+  position: relative;
+  pointer-events: none;
+}
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 .nav-card {
-  background:var(--card-bg); padding:16px 14px; margin-bottom:8px;
+  background:var(--card-bg); padding:16px 14px; margin-bottom:10px;
   border:1px solid var(--border); display:flex; align-items:center; gap:12px;
   cursor:pointer; transition:all 0.2s;
+  /* 小屏点击热区优化 */
+  min-height: 60px;
 }
 .nav-card:hover { border-color:var(--primary); background:#F7F8FF; }
 .nav-card.round { border-radius:16px; }
@@ -44,7 +81,6 @@ html,body {
   font-size:16px; flex-shrink:0;
 }
 .nav-text { flex:1; font-size:15px; font-weight:500; color:var(--text-main); }
-
 #splash {
   position:fixed; top:0; left:0; width:100%; height:100vh;
   background:#fff; display:flex; flex-direction:column; align-items:center;
@@ -54,7 +90,6 @@ html,body {
 .splash-title { font-size:26px; font-weight:600; color:var(--text-main); }
 .splash-desc { font-size:14px; color:var(--neutral); }
 .splash-footer { position:absolute; bottom:36px; font-size:12px; color:var(--neutral); }
-
 #notice {
   position:fixed; top:0; left:0; width:100%; height:100vh;
   background:#F7F8FA; display:none; flex-direction:column; align-items:center;
@@ -67,7 +102,6 @@ html,body {
 .notice-title { font-size:18px; font-weight:600; text-align:center; margin-bottom:18px; color:var(--text-main); }
 .notice-content { font-size:15px; line-height:1.7; color:var(--text-normal); white-space:pre-line; margin-bottom:24px; min-height:100px; }
 .notice-btn { width:100%; padding:13px; border-radius:10px; background:var(--primary); color:#fff; font-size:15px; font-weight:500; border:none; cursor:pointer; }
-
 #editModal {
   position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,0.25);
   display:none; align-items:center; justify-content:center; z-index:9999; padding:20px;
@@ -82,7 +116,6 @@ html,body {
 .modal-btns button { flex:1; padding:11px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
 .btn-cancel { background:var(--light); color:var(--text-normal); }
 .btn-save { background:var(--primary); color:#fff; }
-
 #maintain {
   position:fixed; inset:0; z-index:999; background:#F7F8FA;
   display:none; align-items:center; justify-content:center; padding:20px;
@@ -98,7 +131,6 @@ html,body {
   width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
   background:var(--card-bg); font-size:18px; cursor:pointer; color:var(--primary); margin-top:12px;
 }
-
 #login {
   width:100%; max-width:360px; background:var(--card-bg); border-radius:var(--radius);
   padding:40px 30px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
@@ -106,11 +138,18 @@ html,body {
 .login-footer { text-align:center; margin-top:28px; font-size:12px; color:var(--neutral); }
 .admin-icon-btn { position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:18px; color:var(--primary); cursor:pointer; }
 .login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:28px; color:var(--text-main); }
-.login-input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); font-size:15px; margin-bottom:18px; text-align:center; }
+/* 密码输入框容器 */
+.pwd-input-box {
+  position:relative; margin-bottom:18px;
+}
+.login-input { width:100%; padding:13px 16px 13px 40px; border-radius:10px; border:1px solid var(--border); font-size:15px; text-align:left; }
+.pwd-icon {
+  position:absolute; left:14px; top:50%; transform:translateY(-50%);
+  font-size:18px; color:var(--neutral); cursor:pointer;
+}
 .remember-row { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; font-size:14px; color:var(--text-normal); }
 .btn { width:100%; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:500; cursor:pointer; }
 .btn-primary { background:var(--primary); color:#fff; }
-
 #home {
   width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
   padding:30px 20px 70px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
@@ -120,7 +159,6 @@ html,body {
 .back-btn { font-size:18px; color:var(--primary); cursor:pointer; font-weight:500; }
 .category-title { font-size:16px; font-weight:600; color:var(--text-main); margin:16px 0 8px; padding-left:4px; display:flex; align-items:center; gap:6px; }
 .home-footer { position:absolute; bottom:20px; left:0; right:0; text-align:center; font-size:12px; color:var(--neutral); }
-
 #admin {
   width:100%; max-width:380px; background:var(--card-bg); border-radius:var(--radius);
   padding:30px 20px; box-shadow:var(--shadow); border:1px solid var(--border); display:none; position:relative;
@@ -143,7 +181,6 @@ html,body {
 .btn-info { background:#4096ff; color:#fff; }
 .form-switch { display:flex; align-items:center; margin-bottom:10px; font-size:15px; color:var(--text-normal); }
 .form-switch input { transform:scale(1.1); margin-right:8px; }
-
 .manager-line {
   display:flex; align-items:center; padding:13px; background:var(--light); border-radius:10px; margin-bottom:8px;
 }
@@ -156,7 +193,6 @@ html,body {
 .btn-edit { background:var(--warning); }
 .btn-del { background:var(--danger); }
 .btn-toggle { background:var(--primary); }
-
 .log-item {
   padding:8px 10px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-normal);
 }
@@ -164,9 +200,15 @@ html,body {
 .log-ip { color:var(--success); }
 .log-fail { color:var(--danger); }
 .log-success { color:var(--success); }
+/* 本地存储禁用提示 */
+#storageTip {
+  position:fixed; top:0; left:0; width:100%; padding:12px; background:var(--danger); color:#fff; font-size:14px; text-align:center; z-index:999999; display:none;
+}
 </style>
 </head>
 <body>
+<!-- 本地存储禁用提示 -->
+<div id="storageTip">浏览器本地存储已禁用/不可用，请开启后使用本系统！</div>
 
 <div id="splash">
   <div class="splash-icon">🧭</div>
@@ -202,7 +244,7 @@ html,body {
   <div class="maintain-box">
     <div class="maintain-icon">🔧</div>
     <div class="maintain-title" id="mt_title">系统维护中</div>
-    <div class="maintain-desc" id="mt_desc">升级维护中</div>
+    <div class="maintain-desc" id="mt_desc">升级维护中，暂不对外开放</div>
     <button id="adminLoginBtnInMaintain" onclick="show('login')">⚙️</button>
     <div class="maintain-footer" id="maintain_copyright"></div>
   </div>
@@ -211,12 +253,16 @@ html,body {
 <div id="login">
   <button class="admin-icon-btn" id="adminLoginBtn">⚙️</button>
   <div class="login-title">🔐 安全登录</div>
-  <input type="password" class="login-input" id="pwd" placeholder="请输入登录密码">
+  <!-- 密码输入框优化：添加图标和可见性切换 -->
+  <div class="pwd-input-box">
+    <span class="pwd-icon" onclick="togglePwdVisible()">👀</span>
+    <input type="password" class="login-input" id="pwd" placeholder="请输入登录密码">
+  </div>
   <div class="remember-row">
     <input type="checkbox" id="rememberPwd">
     <label for="rememberPwd">记住密码</label>
   </div>
-  <button class="btn btn-primary" id="userLoginBtn">登录</button>
+  <button class="btn btn-primary" id="userLoginBtn" onclick="userLogin()">登录</button>
   <div class="login-footer" id="login_copyright"></div>
 </div>
 
@@ -234,7 +280,6 @@ html,body {
     <div class="head-title">⚙️ 管理后台</div>
     <div class="back-btn" onclick="showLogin()">返回</div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('backupCollapse')">
       <span>💾 备份/还原管理</span>
@@ -247,7 +292,6 @@ html,body {
       <button class="btn btn-info" onclick="restoreFromGithubUrl()" style="width:100%;">🌐 手动从GitHub同步配置</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('styleCollapse')">
       <span>🎨 导航卡片样式</span>
@@ -267,7 +311,6 @@ html,body {
       <button class="btn btn-success" onclick="saveCardStyle()" style="width:100%">💾 应用样式</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('noticeCollapse')">
       <span>📢 公告设置</span>
@@ -283,7 +326,6 @@ html,body {
       <button class="btn btn-success" onclick="saveNotice()" style="width:100%">💾 保存公告</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('maintainCollapse')">
       <span>🛠 维护设置</span>
@@ -299,7 +341,6 @@ html,body {
       </div>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('pwdCollapse')">
       <span>🔐 密码管理</span>
@@ -307,14 +348,13 @@ html,body {
     </div>
     <div class="collapse-body" id="pwdCollapse">
       <input class="form-input" id="old_pwd" type="password" placeholder="原密码">
-      <input class="form-input" id="new_pwd" type="password" placeholder="新密码">
+      <input class="form-input" id="new_pwd" type="password" placeholder="新密码（至少4位）">
       <input class="form-input" id="confirm_pwd" type="password" placeholder="确认新密码">
       <button class="btn btn-primary" onclick="updatePassword()" style="width:100%">✅ 修改密码</button>
       <div style="height:8px;"></div>
       <button class="btn btn-warning" onclick="resetPassword()" style="width:100%">🔄 重置为默认密码</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('categoryCollapse')">
       <span>📂 分类管理</span>
@@ -327,7 +367,6 @@ html,body {
       <button class="btn btn-success" onclick="addCategory()" style="width:100%">➕ 添加分类</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('lineCollapse')">
       <span>🧭 导航管理</span>
@@ -342,7 +381,6 @@ html,body {
       <button class="btn btn-success" onclick="addLine()" style="width:100%">➕ 添加导航</button>
     </div>
   </div>
-
   <div class="section">
     <div class="collapse-header" onclick="toggleCollapse('copyrightCollapse')">
       <span>ℹ️ 版权信息</span>
@@ -353,234 +391,415 @@ html,body {
       <button class="btn btn-success" onclick="saveCopyright()" style="width:100%">💾 保存版权</button>
     </div>
   </div>
-
   <div class="admin-footer" id="admin_copyright"></div>
 </div>
 
 <script>
-// 3路最强国内加速兜底
-const CONFIG_URL_LIST = [
-  // ① jsDelivr 稳定CDN（最快、最稳）
-  "https://cdn.jsdelivr.net/gh/caoyuanlin1990/caoyuanlin1990.github.io@main/nav-backup-1774766170141.json",
-  // ② ghproxy 实时代理（改文件立刻生效）
-  "https://ghproxy.net/https://raw.githubusercontent.com/caoyuanlin1990/caoyuanlin1990.github.io/main/nav-backup-1774766170141.json",
-  // ③ FastGit 备用兜底节点
-  "https://raw.fastgit.org/caoyuanlin1990/caoyuanlin1990.github.io/main/nav-backup-1774766170141.json"
-];
+// ==============================================
+// 全局常量配置（统一管理，便于修改）
+// ==============================================
+const CONFIG = {
+  // GitHub配置拉取地址（3路加速）
+  URL_LIST: [
+    "https://cdn.jsdelivr.net/gh/caoyuanlin1990/caoyuanlin1990.github.io@main/nav-backup-1774766170141.json",
+    "https://ghproxy.net/https://raw.githubusercontent.com/caoyuanlin1990/caoyuanlin1990.github.io/main/nav-backup-1774766170141.json",
+    "https://raw.fastgit.org/caoyuanlin1990/caoyuanlin1990.github.io/main/nav-backup-1774766170141.json"
+  ],
+  // 默认配置
+  DEFAULT_PWD: "668899",
+  DEFAULT_CAT: [{id:1,name:'默认',icon:'📁',hidden:false}],
+  DEFAULT_ICON: '🔗',
+  DEFAULT_COPYRIGHT: '© 2026 闲时导航',
+  // 提示文案
+  TIP: {
+    EMPTY: '不能为空',
+    PWD_NOT_MATCH: '两次输入的新密码不一致',
+    PWD_SHORT: '新密码长度至少4位',
+    PWD_ERROR: '原密码输入错误',
+    DEL_CAT_MIN: '至少保留一个分类',
+    DEL_CAT_TIP: '确定删除该分类？<br>【重要】该分类下的所有导航将自动移入默认分类',
+    DEL_LINE_TIP: '确定删除该导航？删除后无法恢复',
+    RESET_PWD_TIP: '确定将密码重置为默认密码【668899】？<br>重置后需重新登录，原密码将失效',
+    SYNC_TIP: '⚠️ 手动同步将覆盖本地所有配置数据，确定继续？',
+    SUCCESS: '操作成功',
+    FAIL: '操作失败',
+    NET_ERROR: '网络异常，请检查网络后重试',
+    JSON_ERROR: '配置文件损坏，启用本地兜底配置',
+    STORAGE_ERROR: '本地存储操作失败'
+  },
+  // 请求超时时间
+  FETCH_TIMEOUT: 4000
+};
 
+// ==============================================
+// 全局状态封装（减少全局变量污染）
+// ==============================================
+const appState = {
+  cardStyle: 'default',
+  cardIconCenter: false,
+  maintainMode: false,
+  mt_title: '系统维护中',
+  mt_desc: '升级维护中，暂不对外开放',
+  notice_enabled: true,
+  notice_title: '系统公告',
+  notice_text: '欢迎使用闲时导航系统',
+  copyright_text: CONFIG.DEFAULT_COPYRIGHT,
+  categories: CONFIG.DEFAULT_CAT,
+  lines: [],
+  editIndex: -1,
+  // 折叠面板状态
+  collapseState: {},
+  // 密码哈希
+  get pwdHash() {
+    return getStorage('pwd_hash') || md5(CONFIG.DEFAULT_PWD);
+  },
+  set pwdHash(val) {
+    setStorage('pwd_hash', val);
+  }
+};
+
+// ==============================================
+// 本地存储封装（增加异常捕获，兼容禁用场景）
+// ==============================================
+function checkStorage() {
+  try {
+    const testKey = 'nav_test';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    document.getElementById('storageTip').style.display = 'block';
+    return false;
+  }
+}
+function getStorage(key) {
+  if (!checkStorage()) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.error(CONFIG.TIP.STORAGE_ERROR, e);
+    return null;
+  }
+}
+function setStorage(key, val) {
+  if (!checkStorage()) return false;
+  try {
+    localStorage.setItem(key, val);
+    return true;
+  } catch (e) {
+    console.error(CONFIG.TIP.STORAGE_ERROR, e);
+    return false;
+  }
+}
+function removeStorage(key) {
+  if (!checkStorage()) return false;
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (e) {
+    console.error(CONFIG.TIP.STORAGE_ERROR, e);
+    return false;
+  }
+}
+
+// ==============================================
+// 通用工具函数（抽离重复逻辑）
+// ==============================================
+// HTML转义（防XSS）
 function encodeHTML(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
 }
+// URL安全校验（修复空值/空格漏洞）
 function safeUrl(url) {
-  try { let u = new URL(url); return u.protocol.startsWith('http') ? url : '#'; } catch { return '#'; }
-}
-function nowStr() { return new Date().toLocaleString(); }
-
-function setAdminLoggedIn() { localStorage.setItem('admin_logged','1'); }
-function isAdminLoggedIn() { return localStorage.getItem('admin_logged')==='1'; }
-
-const DEFAULT_PWD = "668899";
-function getPwdHash() { return localStorage.getItem('pwd_hash') || md5(DEFAULT_PWD); }
-function setPwdHash(h) { localStorage.setItem('pwd_hash',h); }
-
-let cardStyle       = localStorage.getItem('cardStyle') || 'default';
-let cardIconCenter  = localStorage.getItem('cardIconCenter') === 'true';
-let maintainMode    = localStorage.getItem('maintain') === '1';
-let mt_title        = localStorage.getItem('mt_title') || '维护中';
-let mt_desc         = localStorage.getItem('mt_desc')  || '升级维护';
-let notice_enabled  = localStorage.getItem('notice_enabled') !== 'false';
-let notice_title    = localStorage.getItem('notice_title') || '公告';
-let notice_text     = localStorage.getItem('notice_text') || '欢迎使用';
-let copyright_text  = localStorage.getItem('copyright_text') || '© 2026 闲时导航';
-let categories      = JSON.parse(localStorage.getItem('cats')) || [{id:1,name:'默认',icon:'📁',hidden:false}];
-let lines           = JSON.parse(localStorage.getItem('lines')) || [];
-let editIndex       = -1;
-
-// 记住密码相关
-function saveRememberPwd(pwd) {
-  if (document.getElementById('rememberPwd').checked) {
-    localStorage.setItem('remember_pwd', pwd);
-  } else {
-    localStorage.removeItem('remember_pwd');
+  if (!url || url.trim() === '') return '#';
+  try {
+    const u = new URL(url.trim());
+    return u.protocol.startsWith('http') ? u.href : '#';
+  } catch {
+    return '#';
   }
 }
-function loadRememberPwd() {
-  const pwd = localStorage.getItem('remember_pwd');
-  if (pwd) {
-    document.getElementById('pwd').value = pwd;
-    document.getElementById('rememberPwd').checked = true;
-  }
+// 获取当前时间字符串
+function nowStr() {
+  return new Date().toLocaleString();
+}
+// 非空校验（带trim）
+function isEmpty(val) {
+  return !val || val.trim() === '';
+}
+// 按钮防重复提交（禁用+加载状态）
+function btnLoading(btn, isLoading = true) {
+  if (!btn) return;
+  btn.disabled = isLoading;
+  isLoading ? btn.classList.add('loading') : btn.classList.remove('loading');
+}
+// 统一提示弹窗
+function showTip(msg, isSuccess = true) {
+  alert(isSuccess ? `✅ ${msg}` : `❌ ${msg}`);
+}
+// 管理员登录状态
+function setAdminLoggedIn() {
+  setStorage('admin_logged', '1');
+}
+function isAdminLoggedIn() {
+  return getStorage('admin_logged') === '1';
 }
 
+// ==============================================
+// 核心数据处理（打包/解包/持久化）
+// ==============================================
 function packAll() {
   return {
-    categories, lines, cardStyle, cardIconCenter,
-    maintainMode, mt_title, mt_desc,
-    notice_enabled, notice_title, notice_text,
-    copyright_text, pwd_hash:getPwdHash()
+    categories: appState.categories,
+    lines: appState.lines,
+    cardStyle: appState.cardStyle,
+    cardIconCenter: appState.cardIconCenter,
+    maintainMode: appState.maintainMode,
+    mt_title: appState.mt_title,
+    mt_desc: appState.mt_desc,
+    notice_enabled: appState.notice_enabled,
+    notice_title: appState.notice_title,
+    notice_text: appState.notice_text,
+    copyright_text: appState.copyright_text,
+    pwd_hash: appState.pwdHash,
+    collapseState: appState.collapseState
   };
 }
-
 function unpackAll(data) {
-  categories     = data.categories || categories;
-  lines          = data.lines || lines;
-  cardStyle      = data.cardStyle ?? cardStyle;
-  cardIconCenter = data.cardIconCenter ?? cardIconCenter;
-  maintainMode   = data.maintainMode ?? maintainMode;
-  mt_title       = data.mt_title ?? mt_title;
-  mt_desc        = data.mt_desc ?? mt_desc;
-  notice_enabled = data.notice_enabled ?? notice_enabled;
-  notice_title   = data.notice_title ?? notice_title;
-  notice_text    = data.notice_text ?? notice_text;
-  copyright_text = data.copyright_text ?? copyright_text;
-  if(data.pwd_hash) setPwdHash(data.pwd_hash);
+  if (!data) return;
+  // 赋值状态
+  appState.categories = data.categories || CONFIG.DEFAULT_CAT;
+  appState.lines = data.lines || [];
+  appState.cardStyle = data.cardStyle ?? 'default';
+  appState.cardIconCenter = data.cardIconCenter ?? false;
+  appState.maintainMode = data.maintainMode ?? false;
+  appState.mt_title = data.mt_title ?? '系统维护中';
+  appState.mt_desc = data.mt_desc ?? '升级维护中';
+  appState.notice_enabled = data.notice_enabled ?? true;
+  appState.notice_title = data.notice_title ?? '系统公告';
+  appState.notice_text = data.notice_text ?? '欢迎使用';
+  appState.copyright_text = data.copyright_text ?? CONFIG.DEFAULT_COPYRIGHT;
+  appState.collapseState = data.collapseState ?? {};
+  // 密码哈希
+  if (data.pwd_hash) appState.pwdHash = data.pwd_hash;
+  // 持久化到本地
   saveAllToLocal();
+  // 实时更新维护页标题/描述（修复原初始化失效问题）
+  document.getElementById('mt_title').innerText = appState.mt_title;
+  document.getElementById('mt_desc').innerText = appState.mt_desc;
 }
-
 function saveAllToLocal() {
-  localStorage.setItem('cats', JSON.stringify(categories));
-  localStorage.setItem('lines', JSON.stringify(lines));
-  localStorage.setItem('cardStyle', cardStyle);
-  localStorage.setItem('cardIconCenter', cardIconCenter);
-  localStorage.setItem('maintain', maintainMode);
-  localStorage.setItem('mt_title', mt_title);
-  localStorage.setItem('mt_desc', mt_desc);
-  localStorage.setItem('notice_enabled', notice_enabled);
-  localStorage.setItem('notice_title', notice_title);
-  localStorage.setItem('notice_text', notice_text);
-  localStorage.setItem('copyright_text', copyright_text);
+  setStorage('cats', JSON.stringify(appState.categories));
+  setStorage('lines', JSON.stringify(appState.lines));
+  setStorage('cardStyle', appState.cardStyle);
+  setStorage('cardIconCenter', appState.cardIconCenter);
+  setStorage('maintain', appState.maintainMode ? '1' : '0');
+  setStorage('mt_title', appState.mt_title);
+  setStorage('mt_desc', appState.mt_desc);
+  setStorage('notice_enabled', appState.notice_enabled);
+  setStorage('notice_title', appState.notice_title);
+  setStorage('notice_text', appState.notice_text);
+  setStorage('copyright_text', appState.copyright_text);
+  setStorage('collapseState', JSON.stringify(appState.collapseState));
+}
+// 从本地加载状态（初始化用）
+function loadFromLocal() {
+  appState.cardStyle = getStorage('cardStyle') || 'default';
+  appState.cardIconCenter = getStorage('cardIconCenter') === 'true';
+  appState.maintainMode = getStorage('maintain') === '1';
+  appState.mt_title = getStorage('mt_title') || '系统维护中';
+  appState.mt_desc = getStorage('mt_desc') || '升级维护中';
+  appState.notice_enabled = getStorage('notice_enabled') !== 'false';
+  appState.notice_title = getStorage('notice_title') || '系统公告';
+  appState.notice_text = getStorage('notice_text') || '欢迎使用';
+  appState.copyright_text = getStorage('copyright_text') || CONFIG.DEFAULT_COPYRIGHT;
+  appState.categories = JSON.parse(getStorage('cats')) || CONFIG.DEFAULT_CAT;
+  appState.lines = JSON.parse(getStorage('lines')) || [];
+  appState.collapseState = JSON.parse(getStorage('collapseState')) || {};
 }
 
-// 核心：自动从GitHub读取配置
+// ==============================================
+// 配置同步（修复原变量未定义+增强错误处理）
+// ==============================================
 async function autoLoadConfigFromGithub() {
   let syncOk = false;
-  for (let url of CONFIG_URL_LIST) {
+  const splashDesc = document.querySelector('.splash-desc');
+  for (let i = 0; i < CONFIG.URL_LIST.length; i++) {
+    const url = CONFIG.URL_LIST[i];
+    splashDesc.innerText = `正在加载配置(${i+1}/3)...`;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000);
+      const timeout = setTimeout(() => controller.abort(), CONFIG.FETCH_TIMEOUT);
       const res = await fetch(url, {
         signal: controller.signal,
         cache: "no-cache"
       });
       clearTimeout(timeout);
-
-      if (!res.ok) throw new Error("请求异常");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const txt = await res.text();
-      const data = JSON.parse(txt);
-      
+      // 单独捕获JSON解析错误
+      let data;
+      try {
+        data = JSON.parse(txt);
+      } catch (e) {
+        throw new Error(CONFIG.TIP.JSON_ERROR);
+      }
       unpackAll(data);
-      console.log("✅ 成功同步当前线路：", url);
+      console.log(`✅ 成功同步线路${i+1}：`, url);
       syncOk = true;
       break;
     } catch (e) {
-      console.log("❌ 当前线路失败，自动切换下一条：", url);
+      console.log(`❌ 线路${i+1}失败：`, url, e.message);
       continue;
     }
   }
-
   if (!syncOk) {
-    console.log("⚠️ 三条云端线路全部失效，启用本地旧配置兜底");
+    console.log(`⚠️  所有云端线路失效，启用本地兜底配置`);
+    showTip(CONFIG.TIP.JSON_ERROR, false);
   }
-
   renderAll();
   initPageShow();
 }
-
-
-// 手动从GitHub同步配置
 async function restoreFromGithubUrl() {
-  if(!confirm('⚠️ 手动同步将覆盖本地所有数据，确定继续？')) return;
+  if (!confirm(CONFIG.TIP.SYNC_TIP)) return;
+  const btn = event.target;
+  btnLoading(btn, true);
   try {
-    const response = await fetch(CONFIG_GITHUB_URL);
-    if(!response.ok) throw new Error('配置文件拉取失败');
-    const configData = await response.text();
-    const data = JSON.parse(configData);
+    const res = await fetch(CONFIG.URL_LIST[0], { cache: "no-cache" });
+    if (!res.ok) throw new Error(CONFIG.TIP.NET_ERROR);
+    const txt = await res.text();
+    const data = JSON.parse(txt);
     unpackAll(data);
     renderAll();
-    alert('✅ 手动同步GitHub配置成功！');
+    showTip('手动同步GitHub配置成功');
   } catch (e) {
-    alert(`❌ 同步失败：${e.message}`);
+    showTip(`${CONFIG.TIP.FAIL}：${e.message}`, false);
+  } finally {
+    btnLoading(btn, false);
   }
 }
 
 // ==============================================
-// 备份 / 还原
+// 备份/还原（增加按钮防重复）
 // ==============================================
 function exportBackup() {
-  const blob = new Blob([JSON.stringify(packAll(),null,2)],{type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'nav-backup-'+Date.now()+'.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  alert('✅ 本地备份已导出');
+  try {
+    const blob = new Blob([JSON.stringify(packAll(), null, 2)], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'nav-backup-' + Date.now() + '.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showTip('本地备份已导出');
+  } catch (e) {
+    showTip(`${CONFIG.TIP.FAIL}：${e.message}`, false);
+  }
 }
-
 function importBackup() {
-  let f = document.getElementById('restoreFile').files[0];
-  if(!f) { alert('请选择本地备份文件'); return; }
-  let r = new FileReader();
-  r.onload = e=>{
-    try{
-      let d = JSON.parse(e.target.result);
+  const f = document.getElementById('restoreFile').files[0];
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (!f) {
+    showTip('请选择本地备份文件', false);
+    btnLoading(btn, false);
+    return;
+  }
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
       unpackAll(d);
       renderAll();
-      alert('✅ 从本地文件还原成功');
-    }catch(e){alert('❌ 备份文件格式错误')}
+      showTip('从本地文件还原成功');
+    } catch (e) {
+      showTip('备份文件格式错误/损坏', false);
+    } finally {
+      btnLoading(btn, false);
+      // 清空文件选择
+      document.getElementById('restoreFile').value = '';
+    }
   };
   r.readAsText(f);
 }
 
 // ==============================================
-// 渲染
+// 页面渲染（统一管理，优化小屏适配）
 // ==============================================
 function renderAll() {
-  renderCategoryAdmin(); renderHome(); renderAdminLine(); refreshCatSelect(); loadCopyright();
+  renderCategoryAdmin();
+  renderHome();
+  renderAdminLine();
+  refreshCatSelect();
+  loadCopyright();
+  renderCollapseState();
 }
+// 版权信息渲染
 function loadCopyright() {
-  let t = encodeHTML(copyright_text);
-  document.getElementById('splash_copyright').innerText = t;
-  document.getElementById('notice_copyright').innerText = t;
-  document.getElementById('maintain_copyright').innerText = t;
-  document.getElementById('login_copyright').innerText = t;
-  document.getElementById('home_copyright').innerText = t;
-  document.getElementById('admin_copyright').innerText = t;
+  const t = encodeHTML(appState.copyright_text);
+  const copyrightEls = [
+    'splash_copyright', 'notice_copyright', 'maintain_copyright',
+    'login_copyright', 'home_copyright', 'admin_copyright'
+  ];
+  copyrightEls.forEach(id => {
+    document.getElementById(id).innerText = t;
+  });
 }
-
+// 折叠面板状态持久化（修复刷新后收起问题）
+function renderCollapseState() {
+  for (const [key, isShow] of Object.entries(appState.collapseState)) {
+    const body = document.getElementById(key);
+    const arrow = document.getElementById(`arr_${key}`);
+    if (body && arrow) {
+      if (isShow) body.classList.add('show');
+      arrow.innerText = isShow ? '▼' : '▶';
+    }
+  }
+}
 function toggleCollapse(id) {
-  let b = document.getElementById(id);
-  let a = document.getElementById('arr_'+id);
-  b.classList.toggle('show');
-  a.innerText = b.classList.contains('show') ? '▼' : '▶';
+  const body = document.getElementById(id);
+  const arrow = document.getElementById(`arr_${id}`);
+  body.classList.toggle('show');
+  const isShow = body.classList.contains('show');
+  arrow.innerText = isShow ? '▼' : '▶';
+  // 保存折叠状态
+  appState.collapseState[id] = isShow;
+  setStorage('collapseState', JSON.stringify(appState.collapseState));
 }
-
+// 页面显示控制（修复记住密码加载时机）
 function show(id) {
+  // 隐藏所有页面
   ['splash','notice','maintain','login','home','admin','editModal'].forEach(i=>{
     document.getElementById(i).style.display='none';
   });
-  if(maintainMode && !isAdminLoggedIn()){
-    document.getElementById('maintain').style.display='flex'; return;
+  // 维护模式校验
+  if(appState.maintainMode && !isAdminLoggedIn()){
+    document.getElementById('maintain').style.display='flex';
+    return;
   }
+  // 显示目标页面
   if(['splash','notice','maintain','editModal'].includes(id)){
     document.getElementById(id).style.display='flex';
   }else{
     document.getElementById(id).style.display='block';
   }
+  // 登录页自动加载记住的密码（所有入口统一）
+  if (id === 'login') loadRememberPwd();
   loadCopyright();
 }
-
+// 显示登录页（清空输入）
 function showLogin() {
-  document.getElementById('pwd').value='';
-  document.getElementById('rememberPwd').checked=false;
-  loadRememberPwd();
+  document.getElementById('pwd').value = '';
+  document.getElementById('pwd').type = 'password';
+  document.getElementById('rememberPwd').checked = false;
   show('login');
 }
-
-function closeNotice(){show('login');}
-
-// 加载完成后初始化页面显示
+// 关闭公告
+function closeNotice() {
+  show('login');
+}
+// 初始化页面显示
 function initPageShow() {
-  if(maintainMode && !isAdminLoggedIn()){
+  if (appState.maintainMode && !isAdminLoggedIn()) {
     show('maintain');
   } else {
     showLogin();
@@ -588,23 +807,54 @@ function initPageShow() {
 }
 
 // ==============================================
-// 分类 & 导航
+// 记住密码+密码可见性（新增优化）
 // ==============================================
-function refreshCatSelect() {
-  let a = document.getElementById('add_cid');
-  let e = document.getElementById('edit_cid');
-  a.innerHTML=''; e.innerHTML='';
-  categories.forEach(c=>{
-    a.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
-    e.innerHTML+=`<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
-  });
+function saveRememberPwd(pwd) {
+  if (document.getElementById('rememberPwd').checked) {
+    setStorage('remember_pwd', pwd);
+  } else {
+    removeStorage('remember_pwd');
+  }
+}
+function loadRememberPwd() {
+  const pwd = getStorage('remember_pwd');
+  if (pwd) {
+    document.getElementById('pwd').value = pwd;
+    document.getElementById('rememberPwd').checked = true;
+  }
+}
+// 密码可见/隐藏切换
+function togglePwdVisible() {
+  const pwdInput = document.getElementById('pwd');
+  const pwdIcon = document.querySelector('.pwd-icon');
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    pwdIcon.innerText = '🙈';
+  } else {
+    pwdInput.type = 'password';
+    pwdIcon.innerText = '👀';
+  }
 }
 
+// ==============================================
+// 分类管理（优化删除提示+防重复）
+// ==============================================
+function refreshCatSelect() {
+  const addCid = document.getElementById('add_cid');
+  const editCid = document.getElementById('edit_cid');
+  addCid.innerHTML = '';
+  editCid.innerHTML = '';
+  appState.categories.forEach(c => {
+    addCid.innerHTML += `<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+    editCid.innerHTML += `<option value="${c.id}">${c.icon||''} ${c.name}</option>`;
+  });
+}
 function renderCategoryAdmin() {
-  let dom = document.getElementById('categoryList'); dom.innerHTML='';
-  categories.forEach((c,i)=>{
-    let vis = c.hidden ? '👁️显示' : '🙈隐藏';
-    dom.innerHTML+=`
+  const dom = document.getElementById('categoryList');
+  dom.innerHTML = '';
+  appState.categories.forEach((c, i) => {
+    const vis = c.hidden ? '👁️显示' : '🙈隐藏';
+    dom.innerHTML += `
     <div class="manager-line">
       <div class="name">${c.icon||''} ${c.name}</div>
       <div>
@@ -614,63 +864,85 @@ function renderCategoryAdmin() {
     </div>`;
   });
 }
-
-function toggleCat(i){
-  categories[i].hidden = !categories[i].hidden;
-  saveAllToLocal(); renderAll();
-}
-function delCat(i){
-  if(categories.length<=1)return alert('至少保留一个分类');
-  if(!confirm('确定删除该分类？相关导航将移入默认分类'))return;
-  let id = categories[i].id;
-  categories.splice(i,1);
-  lines.forEach(x=>{if(x.cid===id)x.cid=categories[0].id;});
-  saveAllToLocal(); renderAll();
-}
-function addCategory(){
-  let n = document.getElementById('add_category_name').value.trim();
-  let ic= document.getElementById('add_category_icon').value.trim()||'📁';
-  if(!n)return alert('请输入分类名称');
-  let mid = categories.length ? Math.max(...categories.map(x=>x.id)) : 0;
-  categories.push({id:mid+1,name:n,icon:ic,hidden:false});
+function toggleCat(i) {
+  appState.categories[i].hidden = !appState.categories[i].hidden;
   saveAllToLocal();
-  document.getElementById('add_category_name').value='';
-  document.getElementById('add_category_icon').value='';
-  renderAll(); alert('✅ 分类添加成功');
+  renderAll();
+}
+function delCat(i) {
+  if (appState.categories.length <= 1) {
+    showTip(CONFIG.TIP.DEL_CAT_MIN, false);
+    return;
+  }
+  // 优化删除提示，明确后果
+  if (!confirm(CONFIG.TIP.DEL_CAT_TIP.replace('<br>', '\n'))) return;
+  const delId = appState.categories[i].id;
+  // 分类下导航移入默认分类
+  appState.lines.forEach(x => {
+    if (x.cid === delId) x.cid = appState.categories[0].id;
+  });
+  appState.categories.splice(i, 1);
+  saveAllToLocal();
+  renderAll();
+  showTip('分类删除成功');
+}
+function addCategory() {
+  const name = document.getElementById('add_category_name').value.trim();
+  const icon = document.getElementById('add_category_icon').value.trim() || '📁';
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (isEmpty(name)) {
+    showTip(`分类名称${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 生成唯一ID
+  const maxId = appState.categories.length ? Math.max(...appState.categories.map(x => x.id)) : 0;
+  appState.categories.push({ id: maxId + 1, name, icon, hidden: false });
+  saveAllToLocal();
+  // 清空输入
+  document.getElementById('add_category_name').value = '';
+  document.getElementById('add_category_icon').value = '';
+  renderAll();
+  showTip('分类添加成功');
+  btnLoading(btn, false);
 }
 
 // ==============================================
-// 首页导航
+// 导航管理（修复URL校验+优化删除提示+防重复）
 // ==============================================
 function renderHome() {
-  let dom = document.getElementById('lineList'); dom.innerHTML='';
-  categories.filter(c=>!c.hidden).forEach(cat=>{
-    let its = lines.filter(it=>it.cid===cat.id && !it.hidden);
-    if(its.length===0)return;
-    dom.innerHTML+=`<div class="category-title">${cat.icon||''} ${cat.name}</div>`;
-    its.forEach(it=>{
-      let cls = `nav-card ${cardStyle} ${cardIconCenter?'center':''}`;
-      dom.innerHTML+=`
+  const dom = document.getElementById('lineList');
+  dom.innerHTML = '';
+  // 过滤显示的分类
+  appState.categories.filter(c => !c.hidden).forEach(cat => {
+    // 过滤分类下显示的导航
+    const its = appState.lines.filter(it => it.cid === cat.id && !it.hidden);
+    if (its.length === 0) return;
+    dom.innerHTML += `<div class="category-title">${cat.icon||''} ${cat.name}</div>`;
+    its.forEach(it => {
+      const cls = `nav-card ${appState.cardStyle} ${appState.cardIconCenter ? 'center' : ''}`;
+      dom.innerHTML += `
         <div class="${cls}" onclick="window.open('${safeUrl(it.url)}','_blank')">
-          <div class="nav-icon">${it.icon||'🔗'}</div>
+          <div class="nav-icon">${it.icon||CONFIG.DEFAULT_ICON}</div>
           <div class="nav-text">${encodeHTML(it.name)}</div>
         </div>`;
     });
   });
 }
-
 function renderAdminLine() {
-  let dom = document.getElementById('adminLineList'); dom.innerHTML='';
-  lines.forEach((it,i)=>{
-    let c = categories.find(x=>x.id===it.cid);
-    let vis = it.hidden ? '🙈显示' : '👁️隐藏';
-    dom.innerHTML+=`
+  const dom = document.getElementById('adminLineList');
+  dom.innerHTML = '';
+  appState.lines.forEach((it, i) => {
+    const c = appState.categories.find(x => x.id === it.cid) || appState.categories[0];
+    const vis = it.hidden ? '🙈显示' : '👁️隐藏';
+    dom.innerHTML += `
       <div class="manager-line">
         <div class="sort-btns">
           <button onclick="up(${i})">↑</button>
           <button onclick="down(${i})">↓</button>
         </div>
-        <div class="name">${it.icon||''} ${it.name} (${c?c.name:'默认分类'})</div>
+        <div class="name">${it.icon||''} ${it.name} (${c.name})</div>
         <div>
           <button class="btn-toggle" onclick="toggleLine(${i})">${vis}</button>
           <button class="btn-edit" onclick="openEdit(${i})">修改</button>
@@ -679,129 +951,294 @@ function renderAdminLine() {
       </div>`;
   });
 }
-
-function up(i){if(i<=0)return;[lines[i-1],lines[i]]=[lines[i],lines[i-1]];saveAllToLocal();renderAll();}
-function down(i){if(i>=lines.length-1)return;[lines[i],lines[i+1]]=[lines[i+1],lines[i]];saveAllToLocal();renderAll();}
-function toggleLine(i){lines[i].hidden=!lines[i].hidden;saveAllToLocal();renderAll();}
-function delLine(i){if(!confirm('确定删除该导航？'))return;lines.splice(i,1);saveAllToLocal();renderAll();}
-function addLine(){
-  let n=document.getElementById('add_name').value.trim();
-  let u=document.getElementById('add_url').value.trim();
-  let ic=document.getElementById('add_icon').value.trim()||'🔗';
-  let cid=+document.getElementById('add_cid').value;
-  if(!n||!u)return alert('导航名称和跳转地址不能为空');
-  lines.push({name:n,url:u,icon:ic,cid,hidden:false});
+// 导航上下排序
+function up(i) {
+  if (i <= 0) return;
+  [appState.lines[i-1], appState.lines[i]] = [appState.lines[i], appState.lines[i-1]];
   saveAllToLocal();
-  document.getElementById('add_name').value='';
-  document.getElementById('add_url').value='';
-  document.getElementById('add_icon').value='';
-  renderAll(); alert('✅ 导航添加成功');
+  renderAll();
 }
-function openEdit(i){editIndex=i;let it=lines[i];
-document.getElementById('edit_name').value=it.name;
-document.getElementById('edit_url').value=it.url;
-document.getElementById('edit_icon').value=it.icon||'';
-document.getElementById('edit_cid').value=it.cid;
-document.getElementById('editModal').style.display='flex';
+function down(i) {
+  if (i >= appState.lines.length - 1) return;
+  [appState.lines[i], appState.lines[i+1]] = [appState.lines[i+1], appState.lines[i]];
+  saveAllToLocal();
+  renderAll();
 }
-function closeEdit(){document.getElementById('editModal').style.display='none';}
-function saveEdit(){
-  let n=document.getElementById('edit_name').value.trim();
-  let u=document.getElementById('edit_url').value.trim();
-  let ic=document.getElementById('edit_icon').value.trim()||'🔗';
-  let cid=+document.getElementById('edit_cid').value;
-  if(!n||!u)return alert('导航名称和跳转地址不能为空');
-  lines[editIndex]={...lines[editIndex],name:n,url:u,icon:ic,cid};
-  saveAllToLocal(); renderAll(); closeEdit(); alert('✅ 导航修改成功');
+// 导航显示/隐藏
+function toggleLine(i) {
+  appState.lines[i].hidden = !appState.lines[i].hidden;
+  saveAllToLocal();
+  renderAll();
+}
+// 导航删除（优化提示）
+function delLine(i) {
+  if (!confirm(CONFIG.TIP.DEL_LINE_TIP)) return;
+  appState.lines.splice(i, 1);
+  saveAllToLocal();
+  renderAll();
+  showTip('导航删除成功');
+}
+// 新增导航（修复URL空格漏洞+防重复）
+function addLine() {
+  const name = document.getElementById('add_name').value.trim();
+  const url = document.getElementById('add_url').value;
+  const icon = document.getElementById('add_icon').value.trim() || CONFIG.DEFAULT_ICON;
+  const cid = +document.getElementById('add_cid').value;
+  const btn = event.target;
+  btnLoading(btn, true);
+  // 非空校验
+  if (isEmpty(name)) {
+    showTip(`导航名称${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  if (isEmpty(url)) {
+    showTip(`跳转地址${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  appState.lines.push({ name, url, icon, cid, hidden: false });
+  saveAllToLocal();
+  // 清空输入
+  document.getElementById('add_name').value = '';
+  document.getElementById('add_url').value = '';
+  document.getElementById('add_icon').value = '';
+  renderAll();
+  showTip('导航添加成功');
+  btnLoading(btn, false);
+}
+// 打开编辑弹窗
+function openEdit(i) {
+  appState.editIndex = i;
+  const it = appState.lines[i];
+  document.getElementById('edit_name').value = it.name;
+  document.getElementById('edit_url').value = it.url;
+  document.getElementById('edit_icon').value = it.icon || '';
+  document.getElementById('edit_cid').value = it.cid;
+  document.getElementById('editModal').style.display = 'flex';
+}
+// 关闭编辑弹窗
+function closeEdit() {
+  document.getElementById('editModal').style.display = 'none';
+  appState.editIndex = -1;
+}
+// 保存编辑导航（防重复）
+function saveEdit() {
+  const name = document.getElementById('edit_name').value.trim();
+  const url = document.getElementById('edit_url').value;
+  const icon = document.getElementById('edit_icon').value.trim() || CONFIG.DEFAULT_ICON;
+  const cid = +document.getElementById('edit_cid').value;
+  const btn = event.target;
+  btnLoading(btn, true);
+  // 非空校验
+  if (isEmpty(name)) {
+    showTip(`导航名称${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  if (isEmpty(url)) {
+    showTip(`跳转地址${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  appState.lines[appState.editIndex] = { ...appState.lines[appState.editIndex], name, url, icon, cid };
+  saveAllToLocal();
+  renderAll();
+  closeEdit();
+  showTip('导航修改成功');
+  btnLoading(btn, false);
 }
 
 // ==============================================
-// 设置
+// 系统设置（防重复+完善校验）
 // ==============================================
-function saveCardStyle(){
-  cardStyle=document.getElementById('cardStyleSelect').value;
-  cardIconCenter=document.getElementById('cardIconCenter').checked;
-  localStorage.setItem('cardStyle',cardStyle);
-  localStorage.setItem('cardIconCenter',cardIconCenter);
-  renderHome(); alert('🎨 卡片样式设置已保存并应用');
+// 保存卡片样式
+function saveCardStyle() {
+  appState.cardStyle = document.getElementById('cardStyleSelect').value;
+  appState.cardIconCenter = document.getElementById('cardIconCenter').checked;
+  setStorage('cardStyle', appState.cardStyle);
+  setStorage('cardIconCenter', appState.cardIconCenter);
+  renderHome();
+  showTip('卡片样式设置已保存并应用');
 }
-function saveNotice(){
-  notice_enabled=document.getElementById('notice_enabled').checked;
-  notice_title=document.getElementById('notice_title').value.trim();
-  notice_text=document.getElementById('notice_text').value.trim();
-  if(!notice_title||!notice_text)return alert('公告标题和内容不能为空');
-  localStorage.setItem('notice_enabled',notice_enabled);
-  localStorage.setItem('notice_title',notice_title);
-  localStorage.setItem('notice_text',notice_text);
-  alert('✅ 公告设置已保存');
+// 保存公告设置
+function saveNotice() {
+  appState.notice_enabled = document.getElementById('notice_enabled').checked;
+  const title = document.getElementById('notice_title').value.trim();
+  const text = document.getElementById('notice_text').value.trim();
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (isEmpty(title) || isEmpty(text)) {
+    showTip(`公告标题和内容${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  appState.notice_title = title;
+  appState.notice_text = text;
+  saveAllToLocal();
+  showTip('公告设置已保存');
+  btnLoading(btn, false);
 }
-function saveSet(){
-  mt_title=document.getElementById('set_title').value.trim();
-  mt_desc=document.getElementById('set_desc').value.trim();
-  if(!mt_title||!mt_desc)return alert('维护标题和说明不能为空');
-  localStorage.setItem('mt_title',mt_title);
-  localStorage.setItem('mt_desc',mt_desc);
-  document.getElementById('mt_title').innerText=mt_title;
-  document.getElementById('mt_desc').innerText=mt_desc;
-  alert('✅ 维护设置已保存');
+// 保存维护设置
+function saveSet() {
+  const title = document.getElementById('set_title').value.trim();
+  const desc = document.getElementById('set_desc').value.trim();
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (isEmpty(title) || isEmpty(desc)) {
+    showTip(`维护标题和说明${CONFIG.TIP.EMPTY}`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  appState.mt_title = title;
+  appState.mt_desc = desc;
+  saveAllToLocal();
+  document.getElementById('mt_title').innerText = title;
+  document.getElementById('mt_desc').innerText = desc;
+  showTip('维护设置已保存');
+  btnLoading(btn, false);
 }
-function saveCopyright(){
-  copyright_text=document.getElementById('copyright_text').value.trim();
-  if(!copyright_text)return alert('请输入版权信息');
-  localStorage.setItem('copyright_text',copyright_text);
-  loadCopyright(); alert('✅ 版权信息已保存');
+// 保存版权信息
+function saveCopyright() {
+  const text = document.getElementById('copyright_text').value.trim();
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (isEmpty(text)) {
+    showTip(`请输入版权信息`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  appState.copyright_text = text;
+  saveAllToLocal();
+  loadCopyright();
+  showTip('版权信息已保存');
+  btnLoading(btn, false);
 }
-function openMt(){localStorage.setItem('maintain','1');maintainMode=true;show('maintain');alert('🔒 已开启维护模式，仅管理员可访问');}
-function closeMt(){localStorage.setItem('maintain','0');maintainMode=false;show('home');alert('🔓 已关闭维护模式，所有人可正常访问');}
-
-function updatePassword(){
-  let o=document.getElementById('old_pwd').value.trim();
-  let n=document.getElementById('new_pwd').value.trim();
-  let c=document.getElementById('confirm_pwd').value.trim();
-  if(!o||!n||!c)return alert('请填写完整的密码信息');
-  if(n!==c)return alert('两次输入的新密码不一致');
-  if(n.length<4)return alert('新密码长度至少4位');
-  if(md5(o)!==getPwdHash())return alert('原密码输入错误');
-  setPwdHash(md5(n));
-  document.getElementById('old_pwd').value='';
-  document.getElementById('new_pwd').value='';
-  document.getElementById('confirm_pwd').value='';
-  alert('✅ 密码修改成功，请重新登录');
-  localStorage.removeItem('remember_pwd');
+// 开启维护模式
+function openMt() {
+  setStorage('maintain', '1');
+  appState.maintainMode = true;
+  show('maintain');
+  showTip('已开启维护模式，仅管理员可访问');
+}
+// 关闭维护模式
+function closeMt() {
+  setStorage('maintain', '0');
+  appState.maintainMode = false;
+  show('home');
+  showTip('已关闭维护模式，所有人可正常访问');
+}
+// 修改密码（防重复+完善校验）
+function updatePassword() {
+  const oldPwd = document.getElementById('old_pwd').value.trim();
+  const newPwd = document.getElementById('new_pwd').value.trim();
+  const confirmPwd = document.getElementById('confirm_pwd').value.trim();
+  const btn = event.target;
+  btnLoading(btn, true);
+  // 非空校验
+  if (isEmpty(oldPwd) || isEmpty(newPwd) || isEmpty(confirmPwd)) {
+    showTip(`请填写完整的密码信息`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 密码一致性校验
+  if (newPwd !== confirmPwd) {
+    showTip(CONFIG.TIP.PWD_NOT_MATCH, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 密码长度校验
+  if (newPwd.length < 4) {
+    showTip(CONFIG.TIP.PWD_SHORT, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 原密码校验
+  if (md5(oldPwd) !== appState.pwdHash) {
+    showTip(CONFIG.TIP.PWD_ERROR, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 保存新密码
+  appState.pwdHash = md5(newPwd);
+  // 清空输入
+  document.getElementById('old_pwd').value = '';
+  document.getElementById('new_pwd').value = '';
+  document.getElementById('confirm_pwd').value = '';
+  // 清除记住的密码
+  removeStorage('remember_pwd');
+  showTip('密码修改成功，请重新登录');
+  showLogin();
+  btnLoading(btn, false);
+}
+// 重置密码（优化提示）
+function resetPassword() {
+  if (!confirm(CONFIG.TIP.RESET_PWD_TIP.replace('<br>', '\n'))) return;
+  appState.pwdHash = md5(CONFIG.DEFAULT_PWD);
+  removeStorage('remember_pwd');
+  showTip(`密码已重置为默认密码：${CONFIG.DEFAULT_PWD}，请重新登录`);
   showLogin();
 }
-function resetPassword(){if(!confirm('确定将密码重置为默认密码668899？'))return;setPwdHash(md5(DEFAULT_PWD));alert('🔄 密码已重置为默认密码：668899，请重新登录');localStorage.removeItem('remember_pwd');showLogin();}
 
 // ==============================================
-// 登录
+// 登录功能（抽离函数+防重复）
 // ==============================================
-document.getElementById('userLoginBtn').onclick=()=>{
-  let v=document.getElementById('pwd').value.trim();
-  saveRememberPwd(v);
-  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('home');}else alert('❌ 登录密码错误');
-};
-document.getElementById('adminLoginBtn').onclick=()=>{
-  let v=document.getElementById('pwd').value.trim();
-  saveRememberPwd(v);
-  if(md5(v)===getPwdHash()){setAdminLoggedIn();show('admin');}else alert('❌ 登录密码错误');
+function userLogin() {
+  const pwd = document.getElementById('pwd').value.trim();
+  const btn = event.target;
+  btnLoading(btn, true);
+  if (isEmpty(pwd)) {
+    showTip(`请输入登录密码`, false);
+    btnLoading(btn, false);
+    return;
+  }
+  // 密码校验
+  if (md5(pwd) === appState.pwdHash) {
+    saveRememberPwd(pwd);
+    setAdminLoggedIn();
+    show('home');
+  } else {
+    showTip('登录密码错误', false);
+  }
+  btnLoading(btn, false);
+}
+// 管理员后台登录
+document.getElementById('adminLoginBtn').onclick = function() {
+  const pwd = document.getElementById('pwd').value.trim();
+  const btn = this;
+  btnLoading(btn, true);
+  if (md5(pwd) === appState.pwdHash) {
+    saveRememberPwd(pwd);
+    setAdminLoggedIn();
+    show('admin');
+  } else {
+    showTip('登录密码错误', false);
+  }
+  btnLoading(btn, false);
 };
 
 // ==============================================
-// 启动：先自动加载配置，再显示页面
+// 初始化入口（整合所有初始化逻辑）
 // ==============================================
-function init(){
-  document.getElementById('mt_title').innerText=mt_title;
-  document.getElementById('mt_desc').innerText=mt_desc;
-  document.getElementById('notice_enabled').checked=notice_enabled;
-  document.getElementById('notice_title').value=notice_title;
-  document.getElementById('notice_text').value=notice_text;
-  document.getElementById('copyright_text').value=copyright_text;
-  document.getElementById('cardStyleSelect').value=cardStyle;
-  document.getElementById('cardIconCenter').checked=cardIconCenter;
-  // 启动即自动加载GitHub配置
+function init() {
+  // 检测本地存储
+  checkStorage();
+  // 从本地加载状态
+  loadFromLocal();
+  // 初始化DOM赋值
+  document.getElementById('mt_title').innerText = appState.mt_title;
+  document.getElementById('mt_desc').innerText = appState.mt_desc;
+  document.getElementById('notice_enabled').checked = appState.notice_enabled;
+  document.getElementById('notice_title').value = appState.notice_title;
+  document.getElementById('notice_text').value = appState.notice_text;
+  document.getElementById('copyright_text').value = appState.copyright_text;
+  document.getElementById('cardStyleSelect').value = appState.cardStyle;
+  document.getElementById('cardIconCenter').checked = appState.cardIconCenter;
+  // 自动加载GitHub配置
   autoLoadConfigFromGithub();
 }
-init();
+// 页面加载完成后初始化
+window.onload = init;
 </script>
 </body>
 </html>
